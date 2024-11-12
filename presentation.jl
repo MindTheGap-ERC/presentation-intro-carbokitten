@@ -45,23 +45,47 @@ html"""
 # ╔═╡ 02c9fad3-6543-414f-b90e-baa9014a5de1
 md"""
 # Welcome 
-17/NOV/2024, Utrecht
+18/NOV/2024, Utrecht
 
 """
 
 # ╔═╡ 44226213-d6b8-4d58-9dd3-048e16e45632
 md"""
-# Scientific Motivations and Aims
+# Scientific Motivations 
 
-**Dynamics over Myr scale, we donlt have tool to base everything on. Also, dating data is not that precise, so**
+**Carbonate sediments cover a significant area of present-day shallow marine, and make up 20% to 25% of sedimentary rocks.**
 
+This makes carbonate an important target to study. As a geoscientist, investigating the deposition of carbonate sediments over Myr scale is especially interesting. For example, the growth of reef island. However, carbonate sedimentary system is notoriously complex to study. This is because their deposition not only controlled by physical transportation (as silicalsitc sediments do), but also strogly dependent on carbonate production which biology-related. 
 
+"""
+
+# ╔═╡ 89db296a-68eb-4d82-a5e1-00084b56ce3a
+md"""
+# Carbonate Platform
+A sedimentary body possess topographic relief and contains locally-produced carbonate sediments.
+![Bahamas Bank is a typical carbonate platform]("/fig/Bahamabank.jpg")
+
+**Key controller of the growth of carbonate platform**
+
+- Species (carbonate producers): corals? algae? bivalve?
+- Light intensity (related to water-depth)
+- Topography...
+
+*Source: Wikipedia*
 """
 
 # ╔═╡ 0fb5a393-92dc-48f0-b49d-0dc5598e525a
 md"""
-## Carbonate platform forward model is a candidate, but many are not open source? Building a opensource model could substantially.
+# Carbonate platform forward model 
+A carbonate platform forward model may able to untwine the complexity of carbonate sediments deposition.
 
+However, the majority of the model is not open source:
+- CARBONATE 3D
+- CARB3D+
+- DionisosFlow 
+...
+
+We need an open-source carbonate platform forward model! And here we will show examples of utilising this model to answer two questions in geology.
 
 """
 
@@ -71,8 +95,12 @@ md"""
 
 # ╔═╡ d3f8125a-7b59-4ac4-94f1-61fce8903b4b
 md"""
-## Stratigraphy plays a central part to answer geology questions
-Show some researches using stratigraphy to answer questions. E.g., Mass-extinction (K-Pg)? 
+## Question 1: how would incomplete stratigraphy bias our interpretation?
+Stratigraphy is an essential archive to study the past of the Earth.
+![Cambrian Fujunshan formation (limestine) overlies on Qingbaikou formation precambiran limestone](fig/CambrianLimestone.JPG)
+- This figure shows the the uncomformity between PreCambrain limestone and Cambrian limestone. In the lower part, only single-cell algae fossils were found, while in the upper Cambian formation, it is possible to find trilobite (multicellular organism). This is an evidence for Cambrian Explosion.
+
+*Source: Xianyi Liu*
 """
 
 
@@ -80,16 +108,48 @@ Show some researches using stratigraphy to answer questions. E.g., Mass-extincti
 # ╔═╡ 741bbf64-5b80-4e5c-b53e-98d756d68ef6
 md"""
 ## The Stratigraphy is incomplete
-Show Bahamas platform, 95% of time it's not under the water?
+- However, not all information are recorded! Remeber there is an uncomformity!
+- Here is a even more clear example:
+![SealevelBahamas](/fig/SealevelBahamas.jpg)
+
+Where there is no deposition for 95% of time! 
+
+*Source: Fauquembergue et al., 2023*
 """
 
+
+# ╔═╡ c9afa635-c968-488b-9dd4-5f1746f0b861
+md"""
+## The employment of forward modelling may enable us to quntify how much incompleteness is there in the stratigraphy.
+
+
+"""
 
 # ╔═╡ 8bae0730-f7bb-4b4e-9aef-98a749f5ff6a
 md"""
-## Such Incompleteness would substantially bias our interpretations 
-show Holland paper thing? Show Nik's examples from stratpal?
+## The Incompleteness may substantially bias our interpretations 
+**If we ignored the fact that the stratigraphy incomplete, our interpretations based on the information from incomplete stratigraphy might deleiver a faulty result, but fortunetely the forward model may help us spot the bias out**
+
+![Faulty interpretation on trait evolution](fig/PartTraitEvolution.jpg)
+
+- This figure shows that the incomplete stratigraphy (from a forward model) would bias our interpretation of mode of evolution towards "punctuated mode". 
+
+*Source: Hohmann et al., 2024*
 """
 
+
+# ╔═╡ 3dd47c47-2e3a-4970-982d-b1c2eb9cfdd7
+md"""
+# Question2: Growth of a carbonate reef island
+
+**The shape of the reefs differ significantly**
+
+ ![CarbonatePlatformType](fig/CarbonatePlatformShape.gif)
+
+Have a guess why was this? We can leave this question for now, and we will try to employ the forward model to try to answer part of the question.
+
+*Source: Den Bosence, 2005*
+"""
 
 # ╔═╡ 5c1a0004-7f60-4682-8250-018564f05f60
 md"""
@@ -2170,11 +2230,14 @@ version = "1.4.1+1"
 # ╟─eba9dfe7-1ba9-4937-b4c4-439fb521ff15
 # ╠═02c9fad3-6543-414f-b90e-baa9014a5de1
 # ╠═44226213-d6b8-4d58-9dd3-048e16e45632
+# ╠═89db296a-68eb-4d82-a5e1-00084b56ce3a
 # ╠═0fb5a393-92dc-48f0-b49d-0dc5598e525a
 # ╠═b1b2b4b9-9e40-4acf-93b7-1b7b53a12c30
 # ╠═d3f8125a-7b59-4ac4-94f1-61fce8903b4b
 # ╠═741bbf64-5b80-4e5c-b53e-98d756d68ef6
+# ╠═c9afa635-c968-488b-9dd4-5f1746f0b861
 # ╠═8bae0730-f7bb-4b4e-9aef-98a749f5ff6a
+# ╠═3dd47c47-2e3a-4970-982d-b1c2eb9cfdd7
 # ╠═5c1a0004-7f60-4682-8250-018564f05f60
 # ╠═75bbeca0-3170-4072-992e-4f66d09ac5af
 # ╟─0cacd700-cf55-4a97-85a8-f9f40855a7e7
