@@ -42,91 +42,94 @@ html"""
 <button onclick="present()">Toggle Presentation</button>
 """
 
-# ╔═╡ 02c9fad3-6543-414f-b90e-baa9014a5de1
+# ╔═╡ f7b4113e-16fe-4833-95f7-e38fccaa38b7
 md"""
-# Welcome 
-18/NOV/2024, Utrecht
-
+$(PlutoUI.LocalResource.(["./fig/erc.png", "./fig/uu.png", "./fig/nlesc.png"], :height => 80)...)
 """
 
 # ╔═╡ 44226213-d6b8-4d58-9dd3-048e16e45632
 md"""
-# Scientific Motivations 
+# Scientific Motivation
 
+## Carbonate Sediments
+
+$(LocalResource("./fig/CambrianLimestone.JPG", :height=>400))
+
+## Complexity
+
+- Not Just Transportation (Physics is easy!)
+- Carbonate Production, i.e. Biology
+
+## Time scales
+
+- single events: storms
+- seconds: wave induced transport
+- hours: tides
+- years: seasons
+- decades: dynamics of ecology
+"""
+
+#= """
 **Carbonate sediments cover a significant area of present-day shallow marine, and make up 20% to 25% of sedimentary rocks.**
 
 This makes carbonate an important target to study. As a geoscientist, investigating the deposition of carbonate sediments over Myr scale is especially interesting. For example, the growth of reef island. However, carbonate sedimentary system is notoriously complex to study. This is because their deposition not only controlled by physical transportation (as silicalsitc sediments do), but also strogly dependent on carbonate production which biology-related. 
 
-"""
-
-# ╔═╡ 89db296a-68eb-4d82-a5e1-00084b56ce3a
-md"""
-# Carbonate Platform
-A sedimentary body possess topographic relief and contains locally-produced carbonate sediments.
-![Bahamas Bank is a typical carbonate platform]("/fig/Bahamabank.jpg")
-
-**Key controller of the growth of carbonate platform**
-
-- Species (carbonate producers): corals? algae? bivalve?
-- Light intensity (related to water-depth)
-- Topography...
-
-*Source: Wikipedia*
-"""
-
-# ╔═╡ 0fb5a393-92dc-48f0-b49d-0dc5598e525a
-md"""
-# Carbonate platform forward model 
-A carbonate platform forward model may able to untwine the complexity of carbonate sediments deposition.
-
-However, the majority of the model is not open source:
-- CARBONATE 3D
-- CARB3D+
-- DionisosFlow 
-...
-
-We need an open-source carbonate platform forward model! And here we will show examples of utilising this model to answer two questions in geology.
-
-"""
-
-
-# ╔═╡ b1b2b4b9-9e40-4acf-93b7-1b7b53a12c30
-
+""" =#
 
 # ╔═╡ d3f8125a-7b59-4ac4-94f1-61fce8903b4b
 md"""
-## Question 1: how would incomplete stratigraphy bias our interpretation?
+## Question 1
+
+**How would incomplete stratigraphy bias our interpretation?**
+
+$(LocalResource("./fig/CambrianLimestone.JPG", :height=>400))
+
+- Cambrian Explosion?
+"""
+
+#=
 Stratigraphy is an essential archive to study the past of the Earth.
 ![Cambrian Fujunshan formation (limestine) overlies on Qingbaikou formation precambiran limestone](fig/CambrianLimestone.JPG)
 - This figure shows the the uncomformity between PreCambrain limestone and Cambrian limestone. In the lower part, only single-cell algae fossils were found, while in the upper Cambian formation, it is possible to find trilobite (multicellular organism). This is an evidence for Cambrian Explosion.
 
 *Source: Xianyi Liu*
-"""
-
-
+=#
 
 # ╔═╡ 741bbf64-5b80-4e5c-b53e-98d756d68ef6
 md"""
-## The Stratigraphy is incomplete
-- However, not all information are recorded! Remeber there is an uncomformity!
-- Here is a even more clear example:
-![SealevelBahamas](/fig/SealevelBahamas.jpg)
+## Incomplete Stratigraphy
 
-Where there is no deposition for 95% of time! 
+- Not all information are recorded!
+- Bahamas: no deposition for 95% of time! 
+
+$(LocalResource("./fig/SealevelBahamas.jpg"))
 
 *Source: Fauquembergue et al., 2023*
 """
 
 
-# ╔═╡ c9afa635-c968-488b-9dd4-5f1746f0b861
+# ╔═╡ 3dd47c47-2e3a-4970-982d-b1c2eb9cfdd7
 md"""
-## The employment of forward modelling may enable us to quntify how much incompleteness is there in the stratigraphy.
+## Question 2
+**What determines the shape of a carbonate reef?**
 
+$(LocalResource("fig/CarbonatePlatformShape.gif"))
 
+*Source: Den Bosence, 2005*
+"""
+
+# ╔═╡ e9754cdc-1180-4bc5-b87c-a11d659d33aa
+md"""
+# Forward Model 
+"""
+
+# ╔═╡ 0fd4f511-af9d-45b3-9878-edd331d741e0
+md"""
+## Existing Software
 """
 
 # ╔═╡ 8bae0730-f7bb-4b4e-9aef-98a749f5ff6a
-md"""
+#= md"""
 ## The Incompleteness may substantially bias our interpretations 
 **If we ignored the fact that the stratigraphy incomplete, our interpretations based on the information from incomplete stratigraphy might deleiver a faulty result, but fortunetely the forward model may help us spot the bias out**
 
@@ -135,36 +138,8 @@ md"""
 - This figure shows that the incomplete stratigraphy (from a forward model) would bias our interpretation of mode of evolution towards "punctuated mode". 
 
 *Source: Hohmann et al., 2024*
-"""
+""" =#
 
-
-# ╔═╡ 3dd47c47-2e3a-4970-982d-b1c2eb9cfdd7
-md"""
-# Question2: Growth of a carbonate reef island
-
-**The shape of the reefs differ significantly**
-
- ![CarbonatePlatformType](fig/CarbonatePlatformShape.gif)
-
-Have a guess why was this? We can leave this question for now, and we will try to employ the forward model to try to answer part of the question.
-
-*Source: Den Bosence, 2005*
-"""
-
-# ╔═╡ 5c1a0004-7f60-4682-8250-018564f05f60
-md"""
-## OK, that's it, it's time to dive into the model part....
-"""
-
-# ╔═╡ 75bbeca0-3170-4072-992e-4f66d09ac5af
-md"""
-# CarboKitten.jl
-**stratigraphic modelling in Julia**
-
-- Johan Hidding (Netherlands eScience Center)
-- Xianyi Liu (Utrecht University, dep. Geoscience)
-- prof. Emilia Jarochowska (Utrecht University, dep. Geoscience)
-"""
 
 # ╔═╡ 0cacd700-cf55-4a97-85a8-f9f40855a7e7
 md"""
@@ -210,6 +185,16 @@ md"""
 # ╔═╡ afa830cf-f4ce-442d-9649-3e912893052c
 summary_plot("bs92.h5")
 
+# ╔═╡ 2a37ebc6-fa8f-4d65-b0f3-5ded1ba4a4be
+md"""
+# Cellular Automata
+"""
+
+# ╔═╡ 4396a697-7f3e-424c-80c4-3c6a258dae46
+md"""
+# Transport
+"""
+
 # ╔═╡ 1f0f95b1-9a82-47f8-ac48-2d3c56471daa
 md"""
 # Practical
@@ -229,6 +214,79 @@ In the markdown:
 md"""
 - [Docs on writing slides in Pluto](https://www.andreaskroepelin.de/blog/plutoslides/)
 """
+
+# ╔═╡ 6ee4b02a-2d84-465c-970b-4fc8c44c33fd
+begin
+	@kwdef struct TwoColumn{L, R}
+	    left::L
+	    right::R
+		fraction::Int=50
+	end
+	
+	function Base.show(io, mime::MIME"text/html", tc::TwoColumn)
+	    write(io, """<div style="display: flex;"><div style="flex: $(tc.fraction)%; margin-right: 10pt;">""")
+	    show(io, mime, tc.left)
+	    write(io, """</div><div style="flex: $(100 - tc.fraction)%;">""")
+	    show(io, mime, tc.right)
+	    write(io, """</div></div>""")
+	end
+end
+
+# ╔═╡ 75bbeca0-3170-4072-992e-4f66d09ac5af
+TwoColumn(md"""
+# CarboKitten.jl
+**stratigraphic modelling in Julia**
+
+- Johan Hidding (Netherlands eScience Center)
+- Xianyi Liu (Utrecht University, dep. Geoscience)
+- prof. Emilia Jarochowska (Utrecht University, dep. Geoscience)
+
+Utrecht, November 18, 2024
+""", PlutoUI.LocalResource("./fig/mind-the-gap.png", :width=>200), 70)
+
+# ╔═╡ b534ac0c-846d-44fd-9461-b484a5678052
+TwoColumn(md"""
+## Time scales (continued)
+- kiloyears: Milankovitch cycles
+- megayears: evolution
+""", md"""
+$(LocalResource("./fig/MilankovitchCyclesOrbitandCores.png"))
+[By Incredio - Own work, CC BY 3.0](https://commons.wikimedia.org/w/index.php?curid=6930545)
+""", 50)
+
+# ╔═╡ 4607e952-53b2-433c-a4c6-f7a0435c4906
+TwoColumn(md"""
+## Carbonate Platform
+
+**Key controllers of growth:**
+
+- Species
+  - Corals
+  - Algae
+  - Bivalve
+- Light intensity (water depth)
+- Topography
+""",
+md"""
+Bahama Bank
+$(LocalResource("./fig/Bahamabank.jpg", :height=>400))
+[By NASA](http://www.ioccg.org/gallery/bahamabank.html) ([Public Domain](https://commons.wikimedia.org/w/index.php?curid=4279073))
+""", 50)
+
+# ╔═╡ 3f16dfb2-bc9e-4f69-8405-215f3099498f
+TwoColumn(md"""
+Not open source:
+- CARBONATE 3D
+- CARB3D+
+- DionisosFlow 
+""",
+md"""
+$(LocalResource("./fig/oil.jpg"))
+[By GuavaTrain - CC0](https://commons.wikimedia.org/w/index.php?curid=144850636)
+""", 50)
+#=
+We need an open-source carbonate platform forward model! And here we will show examples of utilising this model to answer two questions in geology.
+=#
 
 # ╔═╡ aa20619b-fe16-4b01-9532-8f6c6277d399
 let
@@ -283,9 +341,9 @@ Unitful = "~1.21.0"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.10.3"
+julia_version = "1.11.1"
 manifest_format = "2.0"
-project_hash = "331d2edc07b29f73acde8b0b3cdae5757d93bf43"
+project_hash = "4aba106d1b704bb3f2323d9593d8eb45910eff15"
 
 [[deps.AbstractFFTs]]
 deps = ["LinearAlgebra"]
@@ -374,7 +432,7 @@ version = "2.3.0"
 
 [[deps.ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
-version = "1.1.1"
+version = "1.1.2"
 
 [[deps.ArrayLayouts]]
 deps = ["FillArrays", "LinearAlgebra"]
@@ -388,6 +446,7 @@ weakdeps = ["SparseArrays"]
 
 [[deps.Artifacts]]
 uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
+version = "1.11.0"
 
 [[deps.Automa]]
 deps = ["PrecompileTools", "SIMD", "TranscodingStreams"]
@@ -431,6 +490,7 @@ version = "0.4.3"
 
 [[deps.Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
+version = "1.11.0"
 
 [[deps.Baselet]]
 git-tree-sha1 = "aebf55e6d7795e02ca500a689d326ac979aaf89e"
@@ -462,6 +522,7 @@ version = "0.5.0"
 
 [[deps.CRC32c]]
 uuid = "8bf52ea8-c179-5cab-976a-9e18b702a9bc"
+version = "1.11.0"
 
 [[deps.CRlibm_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -629,6 +690,7 @@ version = "1.0.0"
 [[deps.Dates]]
 deps = ["Printf"]
 uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
+version = "1.11.0"
 
 [[deps.Dbus_jll]]
 deps = ["Artifacts", "Expat_jll", "JLLWrappers", "Libdl"]
@@ -656,6 +718,7 @@ version = "1.9.1"
 [[deps.Distributed]]
 deps = ["Random", "Serialization", "Sockets"]
 uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
+version = "1.11.0"
 
 [[deps.Distributions]]
 deps = ["AliasTables", "FillArrays", "LinearAlgebra", "PDMats", "Printf", "QuadGK", "Random", "SpecialFunctions", "Statistics", "StatsAPI", "StatsBase", "StatsFuns"]
@@ -761,6 +824,7 @@ weakdeps = ["Mmap", "Test"]
 
 [[deps.FileWatching]]
 uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
+version = "1.11.0"
 
 [[deps.FillArrays]]
 deps = ["LinearAlgebra"]
@@ -818,6 +882,7 @@ version = "1.0.14+0"
 [[deps.Future]]
 deps = ["Random"]
 uuid = "9fa8497b-333b-5362-9e8d-4d0656e87820"
+version = "1.11.0"
 
 [[deps.GLFW]]
 deps = ["GLFW_jll"]
@@ -1028,6 +1093,7 @@ version = "2024.2.1+0"
 [[deps.InteractiveUtils]]
 deps = ["Markdown"]
 uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
+version = "1.11.0"
 
 [[deps.Interpolations]]
 deps = ["Adapt", "AxisAlgorithms", "ChainRulesCore", "LinearAlgebra", "OffsetArrays", "Random", "Ratios", "Requires", "SharedArrays", "SparseArrays", "StaticArrays", "WoodburyMatrices"]
@@ -1170,6 +1236,7 @@ version = "1.4.0"
 [[deps.LazyArtifacts]]
 deps = ["Artifacts", "Pkg"]
 uuid = "4af54fe1-eca0-43a8-85a7-787d91b784e3"
+version = "1.11.0"
 
 [[deps.LazyModules]]
 git-tree-sha1 = "a560dd966b386ac9ae60bdd3a3d3a326062d3c3e"
@@ -1190,16 +1257,17 @@ version = "0.6.4"
 [[deps.LibCURL_jll]]
 deps = ["Artifacts", "LibSSH2_jll", "Libdl", "MbedTLS_jll", "Zlib_jll", "nghttp2_jll"]
 uuid = "deac9b47-8bc7-5906-a0fe-35ac56dc84c0"
-version = "8.4.0+0"
+version = "8.6.0+0"
 
 [[deps.LibGit2]]
 deps = ["Base64", "LibGit2_jll", "NetworkOptions", "Printf", "SHA"]
 uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
+version = "1.11.0"
 
 [[deps.LibGit2_jll]]
 deps = ["Artifacts", "LibSSH2_jll", "Libdl", "MbedTLS_jll"]
 uuid = "e37daf67-58a4-590a-8e99-b0245dd2ffc5"
-version = "1.6.4+0"
+version = "1.7.2+0"
 
 [[deps.LibSSH2_jll]]
 deps = ["Artifacts", "Libdl", "MbedTLS_jll"]
@@ -1208,6 +1276,7 @@ version = "1.11.0+1"
 
 [[deps.Libdl]]
 uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
+version = "1.11.0"
 
 [[deps.Libffi_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1260,6 +1329,7 @@ version = "2.40.1+0"
 [[deps.LinearAlgebra]]
 deps = ["Libdl", "OpenBLAS_jll", "libblastrampoline_jll"]
 uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+version = "1.11.0"
 
 [[deps.LogExpFunctions]]
 deps = ["DocStringExtensions", "IrrationalConstants", "LinearAlgebra"]
@@ -1279,6 +1349,7 @@ version = "0.3.28"
 
 [[deps.Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
+version = "1.11.0"
 
 [[deps.MIMEs]]
 git-tree-sha1 = "65f28ad4b594aebe22157d6fac869786a255b7eb"
@@ -1335,6 +1406,7 @@ version = "0.4.2"
 [[deps.Markdown]]
 deps = ["Base64"]
 uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
+version = "1.11.0"
 
 [[deps.MathTeXEngine]]
 deps = ["AbstractTrees", "Automa", "DataStructures", "FreeTypeAbstraction", "GeometryBasics", "LaTeXStrings", "REPL", "RelocatableFolders", "UnicodeFun"]
@@ -1345,7 +1417,7 @@ version = "0.6.2"
 [[deps.MbedTLS_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "c8ffd9c3-330d-5841-b78e-0817d7145fa1"
-version = "2.28.2+1"
+version = "2.28.6+0"
 
 [[deps.MeshIO]]
 deps = ["ColorTypes", "FileIO", "GeometryBasics", "Printf"]
@@ -1373,6 +1445,7 @@ version = "1.2.0"
 
 [[deps.Mmap]]
 uuid = "a63ad114-7e13-5084-954f-fe012c677804"
+version = "1.11.0"
 
 [[deps.ModernGL]]
 deps = ["Libdl"]
@@ -1394,7 +1467,7 @@ version = "0.3.4"
 
 [[deps.MozillaCACerts_jll]]
 uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
-version = "2023.1.10"
+version = "2023.12.12"
 
 [[deps.Netpbm]]
 deps = ["FileIO", "ImageCore", "ImageMetadata"]
@@ -1429,7 +1502,7 @@ version = "1.3.5+1"
 [[deps.OpenBLAS_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
 uuid = "4536629a-c528-5b80-bd46-f80d51c5b363"
-version = "0.3.23+4"
+version = "0.3.27+1"
 
 [[deps.OpenEXR]]
 deps = ["Colors", "FileIO", "OpenEXR_jll"]
@@ -1525,9 +1598,13 @@ uuid = "30392449-352a-5448-841d-b1acce4e97dc"
 version = "0.43.4+0"
 
 [[deps.Pkg]]
-deps = ["Artifacts", "Dates", "Downloads", "FileWatching", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "Serialization", "TOML", "Tar", "UUIDs", "p7zip_jll"]
+deps = ["Artifacts", "Dates", "Downloads", "FileWatching", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "Random", "SHA", "TOML", "Tar", "UUIDs", "p7zip_jll"]
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
-version = "1.10.0"
+version = "1.11.0"
+weakdeps = ["REPL"]
+
+    [deps.Pkg.extensions]
+    REPLExt = "REPL"
 
 [[deps.PkgVersion]]
 deps = ["Pkg"]
@@ -1579,6 +1656,7 @@ version = "2.4.0"
 [[deps.Printf]]
 deps = ["Unicode"]
 uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+version = "1.11.0"
 
 [[deps.ProgressLogging]]
 deps = ["Logging", "SHA", "UUIDs"]
@@ -1616,12 +1694,14 @@ version = "2.11.1"
     Enzyme = "7da242da-08ed-463a-9acd-ee780be4f1d9"
 
 [[deps.REPL]]
-deps = ["InteractiveUtils", "Markdown", "Sockets", "Unicode"]
+deps = ["InteractiveUtils", "Markdown", "Sockets", "StyledStrings", "Unicode"]
 uuid = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
+version = "1.11.0"
 
 [[deps.Random]]
 deps = ["SHA"]
 uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+version = "1.11.0"
 
 [[deps.RangeArrays]]
 git-tree-sha1 = "b9039e93773ddcfc828f12aadf7115b4b4d225f5"
@@ -1696,6 +1776,7 @@ version = "1.4.7"
 
 [[deps.Serialization]]
 uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
+version = "1.11.0"
 
 [[deps.Setfield]]
 deps = ["ConstructionBase", "Future", "MacroTools", "StaticArraysCore"]
@@ -1712,6 +1793,7 @@ version = "0.4.1"
 [[deps.SharedArrays]]
 deps = ["Distributed", "Mmap", "Random", "Serialization"]
 uuid = "1a1011a3-84de-559e-8e89-a11a2f7dc383"
+version = "1.11.0"
 
 [[deps.Showoff]]
 deps = ["Dates", "Grisu"]
@@ -1739,6 +1821,7 @@ version = "0.1.3"
 
 [[deps.Sockets]]
 uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
+version = "1.11.0"
 
 [[deps.SortingAlgorithms]]
 deps = ["DataStructures"]
@@ -1749,7 +1832,7 @@ version = "1.2.1"
 [[deps.SparseArrays]]
 deps = ["Libdl", "LinearAlgebra", "Random", "Serialization", "SuiteSparse_jll"]
 uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
-version = "1.10.0"
+version = "1.11.0"
 
 [[deps.SpecialFunctions]]
 deps = ["IrrationalConstants", "LogExpFunctions", "OpenLibm_jll", "OpenSpecFun_jll"]
@@ -1796,9 +1879,14 @@ uuid = "1e83bf80-4336-4d27-bf5d-d5a4f845583c"
 version = "1.4.3"
 
 [[deps.Statistics]]
-deps = ["LinearAlgebra", "SparseArrays"]
+deps = ["LinearAlgebra"]
+git-tree-sha1 = "ae3bb1eb3bba077cd276bc5cfc337cc65c3075c0"
 uuid = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
-version = "1.10.0"
+version = "1.11.1"
+weakdeps = ["SparseArrays"]
+
+    [deps.Statistics.extensions]
+    SparseArraysExt = ["SparseArrays"]
 
 [[deps.StatsAPI]]
 deps = ["LinearAlgebra"]
@@ -1847,6 +1935,10 @@ version = "0.6.18"
     SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
     StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
+[[deps.StyledStrings]]
+uuid = "f489334b-da3d-4c2e-b8f0-e476e12c162b"
+version = "1.11.0"
+
 [[deps.SuiteSparse]]
 deps = ["Libdl", "LinearAlgebra", "Serialization", "SparseArrays"]
 uuid = "4607b0f0-06f3-5cda-b6b1-a6196a1729e9"
@@ -1854,7 +1946,7 @@ uuid = "4607b0f0-06f3-5cda-b6b1-a6196a1729e9"
 [[deps.SuiteSparse_jll]]
 deps = ["Artifacts", "Libdl", "libblastrampoline_jll"]
 uuid = "bea87d4a-7f5b-5778-9afe-8cc45184846c"
-version = "7.2.1+1"
+version = "7.7.0+0"
 
 [[deps.TOML]]
 deps = ["Dates"]
@@ -1893,6 +1985,7 @@ version = "0.1.7"
 [[deps.Test]]
 deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
 uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+version = "1.11.0"
 
 [[deps.TiffImages]]
 deps = ["ColorTypes", "DataStructures", "DocStringExtensions", "FileIO", "FixedPointNumbers", "IndirectArrays", "Inflate", "Mmap", "OffsetArrays", "PkgVersion", "ProgressMeter", "SIMD", "UUIDs"]
@@ -1945,9 +2038,11 @@ version = "1.5.1"
 [[deps.UUIDs]]
 deps = ["Random", "SHA"]
 uuid = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
+version = "1.11.0"
 
 [[deps.Unicode]]
 uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
+version = "1.11.0"
 
 [[deps.UnicodeFun]]
 deps = ["REPL"]
@@ -2153,7 +2248,7 @@ version = "0.15.2+0"
 [[deps.libblastrampoline_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "8e850b90-86db-534c-a0d3-1478176c7d93"
-version = "5.8.0+1"
+version = "5.11.0+0"
 
 [[deps.libdecor_jll]]
 deps = ["Artifacts", "Dbus_jll", "JLLWrappers", "Libdl", "Libglvnd_jll", "Pango_jll", "Wayland_jll", "xkbcommon_jll"]
@@ -2194,7 +2289,7 @@ version = "1.4.0+0"
 [[deps.nghttp2_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "8e850ede-7688-5339-a07c-302acd2aaf8d"
-version = "1.52.0+1"
+version = "1.59.0+0"
 
 [[deps.oneTBB_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -2228,29 +2323,32 @@ version = "1.4.1+1"
 
 # ╔═╡ Cell order:
 # ╟─eba9dfe7-1ba9-4937-b4c4-439fb521ff15
-# ╠═02c9fad3-6543-414f-b90e-baa9014a5de1
-# ╠═44226213-d6b8-4d58-9dd3-048e16e45632
-# ╠═89db296a-68eb-4d82-a5e1-00084b56ce3a
-# ╠═0fb5a393-92dc-48f0-b49d-0dc5598e525a
-# ╠═b1b2b4b9-9e40-4acf-93b7-1b7b53a12c30
-# ╠═d3f8125a-7b59-4ac4-94f1-61fce8903b4b
-# ╠═741bbf64-5b80-4e5c-b53e-98d756d68ef6
-# ╠═c9afa635-c968-488b-9dd4-5f1746f0b861
-# ╠═8bae0730-f7bb-4b4e-9aef-98a749f5ff6a
-# ╠═3dd47c47-2e3a-4970-982d-b1c2eb9cfdd7
-# ╠═5c1a0004-7f60-4682-8250-018564f05f60
-# ╠═75bbeca0-3170-4072-992e-4f66d09ac5af
+# ╟─75bbeca0-3170-4072-992e-4f66d09ac5af
+# ╟─f7b4113e-16fe-4833-95f7-e38fccaa38b7
+# ╟─44226213-d6b8-4d58-9dd3-048e16e45632
+# ╟─b534ac0c-846d-44fd-9461-b484a5678052
+# ╟─4607e952-53b2-433c-a4c6-f7a0435c4906
+# ╟─d3f8125a-7b59-4ac4-94f1-61fce8903b4b
+# ╟─741bbf64-5b80-4e5c-b53e-98d756d68ef6
+# ╟─3dd47c47-2e3a-4970-982d-b1c2eb9cfdd7
+# ╟─e9754cdc-1180-4bc5-b87c-a11d659d33aa
+# ╟─0fd4f511-af9d-45b3-9878-edd331d741e0
+# ╟─3f16dfb2-bc9e-4f69-8405-215f3099498f
+# ╟─8bae0730-f7bb-4b4e-9aef-98a749f5ff6a
 # ╟─0cacd700-cf55-4a97-85a8-f9f40855a7e7
 # ╟─e036e6cd-253a-43e5-bea5-c8eae9947ab7
 # ╟─100ec665-db19-4714-ae49-6595b44fa2b2
 # ╟─bb797b6f-47c2-4ebc-a096-ed2e8cd0b9ff
 # ╟─6f6fa95d-b163-4cc6-ab3c-9bc86083d54d
 # ╟─afa830cf-f4ce-442d-9649-3e912893052c
+# ╟─2a37ebc6-fa8f-4d65-b0f3-5ded1ba4a4be
+# ╟─4396a697-7f3e-424c-80c4-3c6a258dae46
 # ╟─1f0f95b1-9a82-47f8-ac48-2d3c56471daa
 # ╟─a382876a-f900-4f1b-955b-a4a3aca79be5
 # ╟─85992544-7b70-4cc4-9d98-621ac54370a6
 # ╠═0dbd9cce-a006-11ef-365b-d388b63f5339
 # ╠═771e87fa-4ee7-4c66-b71f-7fbc99505f7c
+# ╠═6ee4b02a-2d84-465c-970b-4fc8c44c33fd
 # ╠═aa20619b-fe16-4b01-9532-8f6c6277d399
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
