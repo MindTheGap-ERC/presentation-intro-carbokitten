@@ -139,6 +139,11 @@ html"""
 <button onclick="present()">Toggle Presentation</button>
 """
 
+# ╔═╡ c25f2a9f-f7c1-41f6-b4ac-03b19377a6e6
+md"""
+# CarboKitten.jl
+"""
+
 # ╔═╡ f7b4113e-16fe-4833-95f7-e38fccaa38b7
 md"""
 $(PlutoUI.LocalResource.(["./fig/erc.png", "./fig/uu.png", "./fig/nlesc.png"], :height => 80)...)
@@ -151,6 +156,11 @@ md"""
 ## Carbonate Sediments
 
 $(LocalResource("./fig/CambrianLimestone.JPG", :height=>400))
+"""
+
+# ╔═╡ e3d5f8db-8df4-4a94-a7d6-fdd7a63b828b
+md"""
+## Carbonate Platform
 """
 
 # ╔═╡ fe8d2c6e-a124-4561-8864-e40cf00ca177
@@ -175,6 +185,9 @@ md"""
 This makes carbonate an important target to study. As a geoscientist, investigating the deposition of carbonate sediments over Myr scale is especially interesting. For example, the growth of reef island. However, carbonate sedimentary system is notoriously complex to study. This is because their deposition not only controlled by physical transportation (as silicalsitc sediments do), but also strogly dependent on carbonate production which biology-related. 
 
 """ =#
+
+# ╔═╡ 00dd6fe1-b3f8-43cd-b021-48a6c1fe2bb4
+md"## Time scales (continued)"
 
 # ╔═╡ d3f8125a-7b59-4ac4-94f1-61fce8903b4b
 md"""
@@ -258,15 +271,10 @@ md"""
 - quantify mutation by processes
 """
 
-# ╔═╡ 100ec665-db19-4714-ae49-6595b44fa2b2
-md"""
-# Carbonate production
-"""
-
 # ╔═╡ bb797b6f-47c2-4ebc-a096-ed2e8cd0b9ff
 md"""
-## Bosscher & Schlager 1992
-**0-d model, based on ODE**
+## Carbonate Production
+**0-d model, based on ODE** (Bosscher & Schlager 1992)
 
 $$\partial_t h = -g_m {\rm tanh}\left[\frac{I_0}{I_k} \exp(-k (h - s(t)))\right].$$
 
@@ -282,10 +290,21 @@ md"""
 ## Reproducing BS92
 """
 
-# ╔═╡ 2a37ebc6-fa8f-4d65-b0f3-5ded1ba4a4be
+# ╔═╡ 40a80600-17de-4012-a8bf-4635485144ef
+md"# CarboKitten.jl"
+
+# ╔═╡ 6fe8d06c-1419-4e6b-8585-db51f9f2b761
 md"""
-# Cellular Automata
+## CarboKitten in short
+
+- Rewrite of CarboCAT
+- Julia
+- Fast
+- Open Source
 """
+
+# ╔═╡ b473ef68-6e08-428c-a99a-f27af6b8c73b
+md"## Cellular Automata"
 
 # ╔═╡ dc828c07-7650-41ca-87b0-ca71378eecf2
 md"""
@@ -328,10 +347,8 @@ md"""
 # ╔═╡ f14d4f60-75c0-4c75-acb1-8de730aaf952
 summary_plot(cap_output)
 
-# ╔═╡ 4396a697-7f3e-424c-80c4-3c6a258dae46
-md"""
-# Transport
-"""
+# ╔═╡ dcabbeb1-4384-4841-b26c-213887feba61
+md"## Active Layer Diffusion"
 
 # ╔═╡ a0066da2-bf7a-410e-8684-3899609b5e01
 md"""
@@ -340,6 +357,15 @@ md"""
 
 # ╔═╡ 99476a07-99e2-4d5d-84d9-313c4d52bc16
 summary_plot(alcap_output)
+
+# ╔═╡ 72a62273-9b25-487b-a0f1-79e91dd37a0d
+md"""
+## eScience byproducts
+
+- Extensive use of Entangled.
+- `ModuleMixins.jl` a Julia package for combining modules hierarchically.
+- `GraphvizDotLang.jl` EDSL for Graphviz output.
+"""
 
 # ╔═╡ 1f0f95b1-9a82-47f8-ac48-2d3c56471daa
 md"""
@@ -378,9 +404,8 @@ begin
 	end
 end
 
-# ╔═╡ 75bbeca0-3170-4072-992e-4f66d09ac5af
+# ╔═╡ 02c49ad8-8a82-456a-9374-d21042bb1bc1
 TwoColumn(md"""
-# CarboKitten.jl
 **stratigraphic modelling in Julia**
 
 - Johan Hidding (Netherlands eScience Center)
@@ -390,10 +415,8 @@ TwoColumn(md"""
 Utrecht, November 18, 2024
 """, PlutoUI.LocalResource("./fig/mind-the-gap.png", :width=>200), 70)
 
-# ╔═╡ 4607e952-53b2-433c-a4c6-f7a0435c4906
+# ╔═╡ dc6d8d67-91b1-45ab-b7b0-996b752112bf
 TwoColumn(md"""
-## Carbonate Platform
-
 **Key controllers of growth:**
 
 - Species
@@ -409,9 +432,8 @@ $(LocalResource("./fig/Bahamabank.jpg", :height=>400))
 [By NASA](http://www.ioccg.org/gallery/bahamabank.html) ([Public Domain](https://commons.wikimedia.org/w/index.php?curid=4279073))
 """, 50)
 
-# ╔═╡ b534ac0c-846d-44fd-9461-b484a5678052
+# ╔═╡ fd2bf45e-8c01-4b75-b981-a8f06a0ef05b
 TwoColumn(md"""
-## Time scales (continued)
 - kiloyears: Milankovitch cycles
 - megayears: evolution
 """, md"""
@@ -424,7 +446,10 @@ TwoColumn(md"""
 Not open source:
 - CARBONATE 3D
 - CARB3D+
-- DionisosFlow 
+- DionisosFlow
+
+Matlab:
+- CarboCAT (Burgess 2013)
 """,
 md"""
 $(LocalResource("./fig/oil.jpg"))
@@ -434,10 +459,8 @@ $(LocalResource("./fig/oil.jpg"))
 We need an open-source carbonate platform forward model! And here we will show examples of utilising this model to answer two questions in geology.
 =#
 
-# ╔═╡ 19eaae9f-4f77-4787-9438-c07793a9c700
+# ╔═╡ 5c2d4e05-b8b7-416f-b56d-c9b73ab72858
 TwoColumn(md"""
-## Cellular Automata
-
 - Model biology
 - Competition, limited resources
 - Reduced to elementary rules
@@ -446,10 +469,8 @@ md"""
 $(LocalResource("./fig/life.gif"))
 """, 50)
 
-# ╔═╡ cd77c107-3eef-434d-b4be-bb5b8d5f8291
+# ╔═╡ 86219909-5970-47fd-aad6-0d2698d5cdd3
 TwoColumn(md"""
-## Active Layer Diffusion
-
 - Inspired on **active layer** approach in river beds (Paola 1992).
 - Transport within top layer of sediment.
 
@@ -2471,12 +2492,15 @@ version = "1.4.1+1"
 
 # ╔═╡ Cell order:
 # ╟─eba9dfe7-1ba9-4937-b4c4-439fb521ff15
-# ╟─75bbeca0-3170-4072-992e-4f66d09ac5af
+# ╟─c25f2a9f-f7c1-41f6-b4ac-03b19377a6e6
+# ╟─02c49ad8-8a82-456a-9374-d21042bb1bc1
 # ╟─f7b4113e-16fe-4833-95f7-e38fccaa38b7
 # ╟─1e51f9c8-4b45-481d-9d55-868e5dec7690
-# ╟─4607e952-53b2-433c-a4c6-f7a0435c4906
+# ╟─e3d5f8db-8df4-4a94-a7d6-fdd7a63b828b
+# ╟─dc6d8d67-91b1-45ab-b7b0-996b752112bf
 # ╟─fe8d2c6e-a124-4561-8864-e40cf00ca177
-# ╟─b534ac0c-846d-44fd-9461-b484a5678052
+# ╟─00dd6fe1-b3f8-43cd-b021-48a6c1fe2bb4
+# ╟─fd2bf45e-8c01-4b75-b981-a8f06a0ef05b
 # ╟─d3f8125a-7b59-4ac4-94f1-61fce8903b4b
 # ╟─741bbf64-5b80-4e5c-b53e-98d756d68ef6
 # ╟─3dd47c47-2e3a-4970-982d-b1c2eb9cfdd7
@@ -2486,22 +2510,24 @@ version = "1.4.1+1"
 # ╟─8bae0730-f7bb-4b4e-9aef-98a749f5ff6a
 # ╟─0cacd700-cf55-4a97-85a8-f9f40855a7e7
 # ╟─e036e6cd-253a-43e5-bea5-c8eae9947ab7
-# ╟─100ec665-db19-4714-ae49-6595b44fa2b2
 # ╟─bb797b6f-47c2-4ebc-a096-ed2e8cd0b9ff
 # ╟─6f6fa95d-b163-4cc6-ab3c-9bc86083d54d
 # ╟─afa830cf-f4ce-442d-9649-3e912893052c
-# ╟─2a37ebc6-fa8f-4d65-b0f3-5ded1ba4a4be
-# ╟─19eaae9f-4f77-4787-9438-c07793a9c700
+# ╟─40a80600-17de-4012-a8bf-4635485144ef
+# ╟─6fe8d06c-1419-4e6b-8585-db51f9f2b761
+# ╟─b473ef68-6e08-428c-a99a-f27af6b8c73b
+# ╟─5c2d4e05-b8b7-416f-b56d-c9b73ab72858
 # ╟─dc828c07-7650-41ca-87b0-ca71378eecf2
 # ╟─a4edb5e9-995c-42eb-89f8-d7f85dfb8dc1
 # ╟─e0e0bc64-c691-471e-8594-ccdf352887f4
 # ╟─f9d9216c-53ab-4878-8701-8877f2ee3dcb
 # ╟─2df751f2-0a2a-42d7-9d0f-3db4af3a8f5d
 # ╠═f14d4f60-75c0-4c75-acb1-8de730aaf952
-# ╟─4396a697-7f3e-424c-80c4-3c6a258dae46
-# ╟─cd77c107-3eef-434d-b4be-bb5b8d5f8291
+# ╟─dcabbeb1-4384-4841-b26c-213887feba61
+# ╟─86219909-5970-47fd-aad6-0d2698d5cdd3
 # ╟─a0066da2-bf7a-410e-8684-3899609b5e01
 # ╟─99476a07-99e2-4d5d-84d9-313c4d52bc16
+# ╟─72a62273-9b25-487b-a0f1-79e91dd37a0d
 # ╟─1f0f95b1-9a82-47f8-ac48-2d3c56471daa
 # ╟─a382876a-f900-4f1b-955b-a4a3aca79be5
 # ╟─85992544-7b70-4cc4-9d98-621ac54370a6
