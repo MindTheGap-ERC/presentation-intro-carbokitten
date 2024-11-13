@@ -16,6 +16,18 @@
 using Markdown
 using InteractiveUtils
 
+# This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
+macro bind(def, element)
+    #! format: off
+    quote
+        local iv = try Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value catch; b -> missing; end
+        local el = $(esc(element))
+        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : iv(el)
+        el
+    end
+    #! format: on
+end
+
 # ╔═╡ 0dbd9cce-a006-11ef-365b-d388b63f5339
 begin
 	using PlutoUI
@@ -28,13 +40,98 @@ end
 
 # ╔═╡ 771e87fa-4ee7-4c66-b71f-7fbc99505f7c
 begin
-	using CarboKitten.Model.BS92: BS92
-	using CarboKitten.Model.ALCAP2: ALCAP2 as ALCAP
-	using CarboKitten.Components.Common
-	using CarboKitten.Components.H5Writer: run as run_model
+	using CarboKitten.Models: BS92
 	using CarboKitten: DataSets
 	using CarboKitten.Visualization: summary_plot
 	using Interpolations
+end
+
+# ╔═╡ c510433d-23d7-45f4-8df8-85f896f15173
+cap_output = let
+	using CarboKitten.Models: CAP
+	
+	FACIES = [
+	    CAP.Facies(
+        maximum_growth_rate = 500u"m/Myr",
+        extinction_coefficient = 0.8u"m^-1",
+        saturation_intensity = 60u"W/m^2"),
+
+	    CAP.Facies(
+        maximum_growth_rate = 400u"m/Myr",
+        extinction_coefficient = 0.1u"m^-1",
+        saturation_intensity = 60u"W/m^2"),
+
+	    CAP.Facies(
+        maximum_growth_rate = 100u"m/Myr",
+        extinction_coefficient = 0.005u"m^-1",
+        saturation_intensity = 60u"W/m^2")
+	]
+
+	function sea_level(t)
+		10.0u"m" * sin(2π * t / 0.3u"Myr") + 3.0u"m" * sin(2π * t / 0.05u"Myr")
+	end
+	
+	INPUT = CAP.Input(
+		tag = "cap1",
+		box = CarboKitten.Box{Coast}(grid_size=(100, 50), phys_scale=150.0u"m"),
+		time = TimeProperties(
+			Δt = 200.0u"yr",
+			steps = 5000,
+			write_interval = 10),
+		sea_level = sea_level,
+		initial_topography = (x, y) -> - x / 300.0,
+		subsidence_rate = 50.0u"m/Myr",
+		insolation = 400.0u"W/m^2",
+		facies = FACIES)
+
+	run_model(Model{CAP}, INPUT, "cap.h5")
+end
+
+# ╔═╡ d775081d-733c-4d0a-ab33-f721d8074604
+alcap_output = let
+	using CarboKitten.Models: ALCAP
+	
+	FACIES = [
+	    ALCAP.Facies(
+        maximum_growth_rate = 500u"m/Myr",
+        extinction_coefficient = 0.8u"m^-1",
+        saturation_intensity = 60u"W/m^2",
+		diffusion_coefficient = 2000u"m"),
+
+	    ALCAP.Facies(
+        maximum_growth_rate = 400u"m/Myr",
+        extinction_coefficient = 0.1u"m^-1",
+        saturation_intensity = 60u"W/m^2",
+		diffusion_coefficient = 10000u"m"),
+
+	    ALCAP.Facies(
+        maximum_growth_rate = 100u"m/Myr",
+        extinction_coefficient = 0.005u"m^-1",
+        saturation_intensity = 60u"W/m^2",
+		diffusion_coefficient = 5000u"m")
+	]
+
+	function sea_level(t)
+		10.0u"m" * sin(2π * t / 0.3u"Myr") + 3.0u"m" * sin(2π * t / 0.05u"Myr")
+	end
+	
+	INPUT = ALCAP.Input(
+		tag = "cap1",
+		box = CarboKitten.Box{Coast}(grid_size=(100, 50), phys_scale=150.0u"m"),
+		time = TimeProperties(
+			Δt = 200.0u"yr",
+			steps = 5000,
+			write_interval = 10),
+		sea_level = sea_level,
+		initial_topography = (x, y) -> - x / 300.0,
+		subsidence_rate = 50.0u"m/Myr",
+		insolation = 400.0u"W/m^2",
+		facies = FACIES,
+		depositional_resolution = 0.5u"m",
+		sediment_buffer_size = 50,
+		disintegration_rate = 50.0u"m/Myr")
+
+	run_model(Model{ALCAP}, INPUT, "alcap.h5")
 end
 
 # ╔═╡ eba9dfe7-1ba9-4937-b4c4-439fb521ff15
@@ -47,14 +144,17 @@ md"""
 $(PlutoUI.LocalResource.(["./fig/erc.png", "./fig/uu.png", "./fig/nlesc.png"], :height => 80)...)
 """
 
-# ╔═╡ 44226213-d6b8-4d58-9dd3-048e16e45632
+# ╔═╡ 1e51f9c8-4b45-481d-9d55-868e5dec7690
 md"""
 # Scientific Motivation
 
 ## Carbonate Sediments
 
 $(LocalResource("./fig/CambrianLimestone.JPG", :height=>400))
+"""
 
+# ╔═╡ fe8d2c6e-a124-4561-8864-e40cf00ca177
+md"""
 ## Complexity
 
 - Not Just Transportation (Physics is easy!)
@@ -182,18 +282,64 @@ md"""
 ## Reproducing BS92
 """
 
-# ╔═╡ afa830cf-f4ce-442d-9649-3e912893052c
-summary_plot("bs92.h5")
-
 # ╔═╡ 2a37ebc6-fa8f-4d65-b0f3-5ded1ba4a4be
 md"""
 # Cellular Automata
 """
 
+# ╔═╡ dc828c07-7650-41ca-87b0-ca71378eecf2
+md"""
+## Burgess 2013
+"""
+
+# ╔═╡ e0e0bc64-c691-471e-8594-ccdf352887f4
+[@bind(ca_reset, PlutoUI.Button("Reset")), @bind(ca_step, PlutoUI.Button("Step"))]
+
+# ╔═╡ f9d9216c-53ab-4878-8701-8877f2ee3dcb
+ca_input, ca_state = let
+	using CarboKitten.Components.CellularAutomaton: Input, initial_state, Facies, step!
+
+	ca_reset
+
+	input = Input(
+		box = CarboKitten.Box{CarboKitten.Periodic{2}}((100, 100), 1u"m"),
+		facies = [Facies() for _ in 1:3])
+
+	result = zeros(Int, 20, input.box.grid_size...)
+	input, initial_state(input)
+end;
+
+# ╔═╡ a4edb5e9-995c-42eb-89f8-d7f85dfb8dc1
+let
+	ca_step	
+	step!(ca_input)(ca_state)
+
+	fig = Figure()
+	ax = Axis(fig[1, 1], aspect=1)
+	heatmap!(ax, ca_state.ca)
+	fig
+end
+
+# ╔═╡ 2df751f2-0a2a-42d7-9d0f-3db4af3a8f5d
+md"""
+## CA Driven Production
+"""
+
+# ╔═╡ f14d4f60-75c0-4c75-acb1-8de730aaf952
+summary_plot(cap_output)
+
 # ╔═╡ 4396a697-7f3e-424c-80c4-3c6a258dae46
 md"""
 # Transport
 """
+
+# ╔═╡ a0066da2-bf7a-410e-8684-3899609b5e01
+md"""
+## ALCAP Model
+"""
+
+# ╔═╡ 99476a07-99e2-4d5d-84d9-313c4d52bc16
+summary_plot(alcap_output)
 
 # ╔═╡ 1f0f95b1-9a82-47f8-ac48-2d3c56471daa
 md"""
@@ -244,16 +390,6 @@ TwoColumn(md"""
 Utrecht, November 18, 2024
 """, PlutoUI.LocalResource("./fig/mind-the-gap.png", :width=>200), 70)
 
-# ╔═╡ b534ac0c-846d-44fd-9461-b484a5678052
-TwoColumn(md"""
-## Time scales (continued)
-- kiloyears: Milankovitch cycles
-- megayears: evolution
-""", md"""
-$(LocalResource("./fig/MilankovitchCyclesOrbitandCores.png"))
-[By Incredio - Own work, CC BY 3.0](https://commons.wikimedia.org/w/index.php?curid=6930545)
-""", 50)
-
 # ╔═╡ 4607e952-53b2-433c-a4c6-f7a0435c4906
 TwoColumn(md"""
 ## Carbonate Platform
@@ -273,6 +409,16 @@ $(LocalResource("./fig/Bahamabank.jpg", :height=>400))
 [By NASA](http://www.ioccg.org/gallery/bahamabank.html) ([Public Domain](https://commons.wikimedia.org/w/index.php?curid=4279073))
 """, 50)
 
+# ╔═╡ b534ac0c-846d-44fd-9461-b484a5678052
+TwoColumn(md"""
+## Time scales (continued)
+- kiloyears: Milankovitch cycles
+- megayears: evolution
+""", md"""
+$(LocalResource("./fig/MilankovitchCyclesOrbitandCores.png"))
+[By Incredio - Own work, CC BY 3.0](https://commons.wikimedia.org/w/index.php?curid=6930545)
+""", 50)
+
 # ╔═╡ 3f16dfb2-bc9e-4f69-8405-215f3099498f
 TwoColumn(md"""
 Not open source:
@@ -288,8 +434,35 @@ $(LocalResource("./fig/oil.jpg"))
 We need an open-source carbonate platform forward model! And here we will show examples of utilising this model to answer two questions in geology.
 =#
 
+# ╔═╡ 19eaae9f-4f77-4787-9438-c07793a9c700
+TwoColumn(md"""
+## Cellular Automata
+
+- Model biology
+- Competition, limited resources
+- Reduced to elementary rules
+""",
+md"""
+$(LocalResource("./fig/life.gif"))
+""", 50)
+
+# ╔═╡ cd77c107-3eef-434d-b4be-bb5b8d5f8291
+TwoColumn(md"""
+## Active Layer Diffusion
+
+- Inspired on **active layer** approach in river beds (Paola 1992).
+- Transport within top layer of sediment.
+
+  $$\partial_t h_f = {\bf \nabla} \cdot \big[ \nu_f\ P_f\ {\bf \nabla} h \big] + P_f,$$
+
+  where $P_f$ includes sediment in the **active layer** and new **production**.
+""",
+md"""
+$(LocalResource("fig/active-layer-export.svg"))
+""", 50)
+
 # ╔═╡ aa20619b-fe16-4b01-9532-8f6c6277d399
-let
+bs92_output = let
 	function sealevel_curve()
 	    data = DataSets.bosscher_schlager_1992()
 	    linear_interpolation(data.time, data.sealevel)
@@ -298,7 +471,7 @@ let
 
 	INPUT = BS92.Input(
 	    tag = "example model BS92",
-	    box = Common.Box{Shelf}(grid_size=(100, 1), phys_scale=600.0u"m"),
+	    box = CarboKitten.Box{Coast}(grid_size=(100, 1), phys_scale=600.0u"m"),
 	    time = TimeProperties(
 	      Δt = 10.0u"yr",
 	      steps = 8000,
@@ -306,7 +479,7 @@ let
 	    sea_level = let sc = sealevel_curve()
 	      t -> -sc(t)
 	    end,
-	    bedrock_elevation = (x, y) -> - x / 300.0,
+	    initial_topography = (x, y) -> - x / 300.0,
 	    subsidence_rate = 0.0u"m/yr",
 	    insolation = 400.0u"W/m^2",
 	    facies = [BS92.Facies(
@@ -317,6 +490,9 @@ let
 	
 	run_model(Model{BS92}, INPUT, "bs92.h5")
 end
+
+# ╔═╡ afa830cf-f4ce-442d-9649-3e912893052c
+summary_plot(bs92_output)
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -329,7 +505,7 @@ PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 
 [compat]
-CarboKitten = "~0.2.0"
+CarboKitten = "~0.3.0"
 GLMakie = "~0.10.16"
 GraphvizDotLang = "~0.2.1"
 Interpolations = "~0.15.1"
@@ -343,7 +519,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.11.1"
 manifest_format = "2.0"
-project_hash = "4aba106d1b704bb3f2323d9593d8eb45910eff15"
+project_hash = "72022678502cbf34cde50a39d93c3520ff57dfff"
 
 [[deps.AbstractFFTs]]
 deps = ["LinearAlgebra"]
@@ -419,12 +595,6 @@ git-tree-sha1 = "e81c509d2c8e49592413bfb0bb3b08150056c79d"
 uuid = "27a7e980-b3e6-11e9-2bcd-0b925532e340"
 version = "0.4.1"
 
-[[deps.Aqua]]
-deps = ["Compat", "Pkg", "Test"]
-git-tree-sha1 = "49b1d7a9870c87ba13dc63f8ccfcf578cb266f95"
-uuid = "4c88cf16-eb10-579e-8560-4a9242c79595"
-version = "0.8.9"
-
 [[deps.ArgCheck]]
 git-tree-sha1 = "a3a402a35a2f7e0b87828ccabbd5ebfbebe356b4"
 uuid = "dce04be8-c92d-5529-be00-80e4d2c0e197"
@@ -433,16 +603,6 @@ version = "2.3.0"
 [[deps.ArgTools]]
 uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
 version = "1.1.2"
-
-[[deps.ArrayLayouts]]
-deps = ["FillArrays", "LinearAlgebra"]
-git-tree-sha1 = "492681bc44fac86804706ddb37da10880a2bd528"
-uuid = "4c555306-a7a7-4459-81d9-ec55ddd5c99a"
-version = "1.10.4"
-weakdeps = ["SparseArrays"]
-
-    [deps.ArrayLayouts.extensions]
-    ArrayLayoutsSparseArraysExt = "SparseArrays"
 
 [[deps.Artifacts]]
 uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
@@ -497,18 +657,6 @@ git-tree-sha1 = "aebf55e6d7795e02ca500a689d326ac979aaf89e"
 uuid = "9718e550-a3fa-408a-8086-8db961cd8217"
 version = "0.1.1"
 
-[[deps.BlockArrays]]
-deps = ["ArrayLayouts", "FillArrays", "LinearAlgebra"]
-git-tree-sha1 = "d434647f798823bcae510aee0bc0401927f64391"
-uuid = "8e7c35d0-a365-5155-bbbb-fb81a777f24e"
-version = "1.1.1"
-
-    [deps.BlockArrays.extensions]
-    BlockArraysBandedMatricesExt = "BandedMatrices"
-
-    [deps.BlockArrays.weakdeps]
-    BandedMatrices = "aae01518-5342-5314-be14-df237901396f"
-
 [[deps.Bzip2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "8873e196c2eb87962a2048b3b8e08946535864a1"
@@ -544,9 +692,9 @@ version = "1.18.2+1"
 
 [[deps.CarboKitten]]
 deps = ["AxisArrays", "CSV", "CategoricalArrays", "DataFrames", "DelimitedFiles", "HDF5", "Logging", "ModuleMixins", "Pkg", "ProgressLogging", "Random", "TOML", "TerminalLoggers", "Transducers", "Unitful"]
-git-tree-sha1 = "8e78eac7e2ab7d32dc003adc3768b03397479f88"
+git-tree-sha1 = "5e68dfeeead0e4dde020585dc00910457a142742"
 uuid = "690c6d5c-626a-429f-a06b-981a1dae1c19"
-version = "0.2.0"
+version = "0.3.0"
 weakdeps = ["GeometryBasics", "Makie", "Statistics"]
 
     [deps.CarboKitten.extensions]
@@ -801,9 +949,9 @@ version = "3.3.10+1"
 
 [[deps.FileIO]]
 deps = ["Pkg", "Requires", "UUIDs"]
-git-tree-sha1 = "62ca0547a14c57e98154423419d8a342dca75ca9"
+git-tree-sha1 = "91e0e5c68d02bcdaae76d3c8ceb4361e8f28d2e9"
 uuid = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
-version = "1.16.4"
+version = "1.16.5"
 
 [[deps.FilePaths]]
 deps = ["FilePathsBase", "MacroTools", "Reexport", "Requires"]
@@ -869,9 +1017,9 @@ version = "2.13.2+0"
 
 [[deps.FreeTypeAbstraction]]
 deps = ["ColorVectorSpace", "Colors", "FreeType", "GeometryBasics"]
-git-tree-sha1 = "84dfe824bd6fdf2a5d73bb187ff31b5549b2a79c"
+git-tree-sha1 = "77e2b094e61d939f9626181ab23d0b76e78f9fd3"
 uuid = "663a7486-cb36-511b-a19d-713bb74d65c9"
-version = "0.10.4"
+version = "0.10.5"
 
 [[deps.FriBidi_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -979,10 +1127,10 @@ version = "0.17.2"
     MPI = "da04e1cc-30fd-572f-bb4f-1f8673147195"
 
 [[deps.HDF5_jll]]
-deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "LazyArtifacts", "LibCURL_jll", "Libdl", "MPICH_jll", "MPIPreferences", "MPItrampoline_jll", "MicrosoftMPI_jll", "OpenMPI_jll", "OpenSSL_jll", "TOML", "Zlib_jll", "libaec_jll"]
-git-tree-sha1 = "82a471768b513dc39e471540fdadc84ff80ff997"
+deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "LLVMOpenMP_jll", "LazyArtifacts", "LibCURL_jll", "Libdl", "MPICH_jll", "MPIPreferences", "MPItrampoline_jll", "MicrosoftMPI_jll", "OpenMPI_jll", "OpenSSL_jll", "TOML", "Zlib_jll", "libaec_jll"]
+git-tree-sha1 = "38c8874692d48d5440d5752d6c74b0c6b0b60739"
 uuid = "0234f1f7-429e-5d53-9886-15a909be8d59"
-version = "1.14.3+3"
+version = "1.14.2+1"
 
 [[deps.HarfBuzz_jll]]
 deps = ["Artifacts", "Cairo_jll", "Fontconfig_jll", "FreeType2_jll", "Glib_jll", "Graphite2_jll", "JLLWrappers", "Libdl", "Libffi_jll"]
@@ -1033,10 +1181,10 @@ uuid = "c817782e-172a-44cc-b673-b171935fbb9e"
 version = "0.1.7"
 
 [[deps.ImageCore]]
-deps = ["Aqua", "BlockArrays", "ColorVectorSpace", "Colors", "FixedPointNumbers", "MappedArrays", "MosaicViews", "OffsetArrays", "PaddedViews", "PrecompileTools", "Reexport"]
-git-tree-sha1 = "661ca04f8df633e8a021c55a22e96cf820220ede"
+deps = ["ColorVectorSpace", "Colors", "FixedPointNumbers", "MappedArrays", "MosaicViews", "OffsetArrays", "PaddedViews", "PrecompileTools", "Reexport"]
+git-tree-sha1 = "8c193230235bbcee22c8066b0374f63b5683c2d3"
 uuid = "a09fc81d-aa75-5fe9-8630-4744c3626534"
-version = "0.10.4"
+version = "0.10.5"
 
 [[deps.ImageIO]]
 deps = ["FileIO", "IndirectArrays", "JpegTurbo", "LazyModules", "Netpbm", "OpenEXR", "PNGFiles", "QOI", "Sixel", "TiffImages", "UUIDs", "WebP"]
@@ -1421,9 +1569,9 @@ version = "2.28.6+0"
 
 [[deps.MeshIO]]
 deps = ["ColorTypes", "FileIO", "GeometryBasics", "Printf"]
-git-tree-sha1 = "dc182956229ff16d5a4d90a562035e633bd2561d"
+git-tree-sha1 = "14a12d9153b1a1a22d669eede58b2ea2164ff138"
 uuid = "7269a6da-0436-5bbc-96c2-40638cbb6118"
-version = "0.4.12"
+version = "0.4.13"
 
 [[deps.MicroCollections]]
 deps = ["Accessors", "BangBang", "InitialValues"]
@@ -1522,10 +1670,10 @@ uuid = "05823500-19ac-5b8b-9628-191a04bc5112"
 version = "0.8.1+2"
 
 [[deps.OpenMPI_jll]]
-deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "LazyArtifacts", "Libdl", "MPIPreferences", "TOML"]
-git-tree-sha1 = "e25c1778a98e34219a00455d6e4384e017ea9762"
+deps = ["Artifacts", "CompilerSupportLibraries_jll", "Hwloc_jll", "JLLWrappers", "LazyArtifacts", "Libdl", "MPIPreferences", "TOML", "Zlib_jll"]
+git-tree-sha1 = "bfce6d523861a6c562721b262c0d1aaeead2647f"
 uuid = "fe0851c0-eecd-5654-98d4-656369965a5c"
-version = "4.1.6+0"
+version = "5.0.5+0"
 
 [[deps.OpenSSL_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
@@ -1758,9 +1906,9 @@ version = "0.7.0"
 
 [[deps.SIMD]]
 deps = ["PrecompileTools"]
-git-tree-sha1 = "98ca7c29edd6fc79cd74c61accb7010a4e7aee33"
+git-tree-sha1 = "52af86e35dd1b177d051b12681e1c581f53c281b"
 uuid = "fdea26ae-647d-5447-a871-4b548cad5224"
-version = "3.6.0"
+version = "3.7.0"
 
 [[deps.Scratch]]
 deps = ["Dates"]
@@ -2325,9 +2473,10 @@ version = "1.4.1+1"
 # ╟─eba9dfe7-1ba9-4937-b4c4-439fb521ff15
 # ╟─75bbeca0-3170-4072-992e-4f66d09ac5af
 # ╟─f7b4113e-16fe-4833-95f7-e38fccaa38b7
-# ╟─44226213-d6b8-4d58-9dd3-048e16e45632
-# ╟─b534ac0c-846d-44fd-9461-b484a5678052
+# ╟─1e51f9c8-4b45-481d-9d55-868e5dec7690
 # ╟─4607e952-53b2-433c-a4c6-f7a0435c4906
+# ╟─fe8d2c6e-a124-4561-8864-e40cf00ca177
+# ╟─b534ac0c-846d-44fd-9461-b484a5678052
 # ╟─d3f8125a-7b59-4ac4-94f1-61fce8903b4b
 # ╟─741bbf64-5b80-4e5c-b53e-98d756d68ef6
 # ╟─3dd47c47-2e3a-4970-982d-b1c2eb9cfdd7
@@ -2342,7 +2491,17 @@ version = "1.4.1+1"
 # ╟─6f6fa95d-b163-4cc6-ab3c-9bc86083d54d
 # ╟─afa830cf-f4ce-442d-9649-3e912893052c
 # ╟─2a37ebc6-fa8f-4d65-b0f3-5ded1ba4a4be
+# ╟─19eaae9f-4f77-4787-9438-c07793a9c700
+# ╟─dc828c07-7650-41ca-87b0-ca71378eecf2
+# ╟─a4edb5e9-995c-42eb-89f8-d7f85dfb8dc1
+# ╟─e0e0bc64-c691-471e-8594-ccdf352887f4
+# ╟─f9d9216c-53ab-4878-8701-8877f2ee3dcb
+# ╟─2df751f2-0a2a-42d7-9d0f-3db4af3a8f5d
+# ╠═f14d4f60-75c0-4c75-acb1-8de730aaf952
 # ╟─4396a697-7f3e-424c-80c4-3c6a258dae46
+# ╟─cd77c107-3eef-434d-b4be-bb5b8d5f8291
+# ╟─a0066da2-bf7a-410e-8684-3899609b5e01
+# ╟─99476a07-99e2-4d5d-84d9-313c4d52bc16
 # ╟─1f0f95b1-9a82-47f8-ac48-2d3c56471daa
 # ╟─a382876a-f900-4f1b-955b-a4a3aca79be5
 # ╟─85992544-7b70-4cc4-9d98-621ac54370a6
@@ -2350,5 +2509,7 @@ version = "1.4.1+1"
 # ╠═771e87fa-4ee7-4c66-b71f-7fbc99505f7c
 # ╠═6ee4b02a-2d84-465c-970b-4fc8c44c33fd
 # ╠═aa20619b-fe16-4b01-9532-8f6c6277d399
+# ╠═c510433d-23d7-45f4-8df8-85f896f15173
+# ╠═d775081d-733c-4d0a-ab33-f721d8074604
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
