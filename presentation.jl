@@ -134,6 +134,15 @@ alcap_output = let
 	run_model(Model{ALCAP}, INPUT, "alcap.h5")
 end
 
+# ╔═╡ 64179a23-b142-46cf-8630-98d80a532250
+using CarboKitten.DataSets: miller_2020
+
+# ╔═╡ 1de3178f-bf54-4d04-ba87-b712fcb994aa
+using SmoothingSplines
+
+# ╔═╡ a1982b18-81d1-47bf-8a70-4f76c3c413e4
+using Loess
+
 # ╔═╡ eba9dfe7-1ba9-4937-b4c4-439fb521ff15
 html"""
 <button onclick="present()">Toggle Presentation</button>
@@ -155,7 +164,7 @@ md"""
 
 ## Carbonate Sediments
 
-$(LocalResource("./fig/CambrianLimestone.JPG", :height=>400))
+$(LocalResource("./fig/carbs.jpg", :height=>400))
 """
 
 # ╔═╡ e3d5f8db-8df4-4a94-a7d6-fdd7a63b828b
@@ -196,6 +205,7 @@ md"""
 **How would incomplete stratigraphy bias our interpretation?**
 
 $(LocalResource("./fig/CambrianLimestone.JPG", :height=>400))
+*foto: Xianyi Liu*
 
 - Cambrian Explosion?
 """
@@ -515,6 +525,25 @@ end
 # ╔═╡ afa830cf-f4ce-442d-9649-3e912893052c
 summary_plot(bs92_output)
 
+# ╔═╡ 3f86f55e-e56b-41b1-bff5-f05eeda0fbdf
+model = let
+	df = miller_2020()
+	ldf = df[df.refkey .== "846 Lisiecki", :]
+	loess(ldf.time |> in_units_of(u"Myr"), ldf.sealevel |> in_units_of(u"m"), span=0.005)
+end
+
+# ╔═╡ 9cf75959-90ec-4cd2-8c00-a95a2ffb1340
+let
+	t = -0.9:0.001:-0.2
+	s = predict(model, t)
+	fig = Figure()
+	ax = Axis(fig[1,1])
+	band!(ax, t, -20.0, max.(s, -20.0), color=:lemonchiffon)
+	lines!(ax, t, s)
+	hlines!(ax, -20.0, color=:black)
+	fig
+end
+
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
@@ -522,7 +551,9 @@ CarboKitten = "690c6d5c-626a-429f-a06b-981a1dae1c19"
 GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
 GraphvizDotLang = "6039e64d-d8b8-4c93-8e43-7efd2f757352"
 Interpolations = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
+Loess = "4345ca2d-374a-55d4-8d30-97f9976e7612"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
+SmoothingSplines = "102930c3-cf33-599f-b3b1-9a29a5acab30"
 Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 
 [compat]
@@ -530,7 +561,9 @@ CarboKitten = "~0.3.0"
 GLMakie = "~0.10.16"
 GraphvizDotLang = "~0.2.1"
 Interpolations = "~0.15.1"
+Loess = "~0.6.4"
 PlutoUI = "~0.7.60"
+SmoothingSplines = "~0.3.2"
 Unitful = "~1.21.0"
 """
 
@@ -540,7 +573,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.11.1"
 manifest_format = "2.0"
-project_hash = "72022678502cbf34cde50a39d93c3520ff57dfff"
+project_hash = "e456ea3d9e793217ac4d0e7818cc96aaf933204e"
 
 [[deps.AbstractFFTs]]
 deps = ["LinearAlgebra"]
@@ -883,6 +916,17 @@ deps = ["Mmap"]
 git-tree-sha1 = "9e2f36d3c96a820c678f2f1f1782582fcf685bae"
 uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 version = "1.9.1"
+
+[[deps.Distances]]
+deps = ["LinearAlgebra", "Statistics", "StatsAPI"]
+git-tree-sha1 = "c7e3a542b999843086e2f29dac96a618c105be1d"
+uuid = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"
+version = "0.10.12"
+weakdeps = ["ChainRulesCore", "SparseArrays"]
+
+    [deps.Distances.extensions]
+    DistancesChainRulesCoreExt = "ChainRulesCore"
+    DistancesSparseArraysExt = "SparseArrays"
 
 [[deps.Distributed]]
 deps = ["Random", "Serialization", "Sockets"]
@@ -1500,6 +1544,12 @@ deps = ["Libdl", "OpenBLAS_jll", "libblastrampoline_jll"]
 uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 version = "1.11.0"
 
+[[deps.Loess]]
+deps = ["Distances", "LinearAlgebra", "Statistics", "StatsAPI"]
+git-tree-sha1 = "f749e7351f120b3566e5923fefdf8e52ba5ec7f9"
+uuid = "4345ca2d-374a-55d4-8d30-97f9976e7612"
+version = "0.6.4"
+
 [[deps.LogExpFunctions]]
 deps = ["DocStringExtensions", "IrrationalConstants", "LinearAlgebra"]
 git-tree-sha1 = "a2d09619db4e765091ee5c6ffe8872849de0feea"
@@ -1987,6 +2037,12 @@ deps = ["Dates", "FileIO", "ImageCore", "IndirectArrays", "OffsetArrays", "REPL"
 git-tree-sha1 = "2da10356e31327c7096832eb9cd86307a50b1eb6"
 uuid = "45858cf5-a6b0-47a3-bbea-62219f50df47"
 version = "0.1.3"
+
+[[deps.SmoothingSplines]]
+deps = ["LinearAlgebra", "Random", "Reexport", "StatsBase"]
+git-tree-sha1 = "3a68e878003f7d6ea0be9e3bafcabfb79f5a70ee"
+uuid = "102930c3-cf33-599f-b3b1-9a29a5acab30"
+version = "0.3.2"
 
 [[deps.Sockets]]
 uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
@@ -2537,5 +2593,10 @@ version = "1.4.1+1"
 # ╠═aa20619b-fe16-4b01-9532-8f6c6277d399
 # ╠═c510433d-23d7-45f4-8df8-85f896f15173
 # ╠═d775081d-733c-4d0a-ab33-f721d8074604
+# ╠═64179a23-b142-46cf-8630-98d80a532250
+# ╠═3f86f55e-e56b-41b1-bff5-f05eeda0fbdf
+# ╠═9cf75959-90ec-4cd2-8c00-a95a2ffb1340
+# ╠═1de3178f-bf54-4d04-ba87-b712fcb994aa
+# ╠═a1982b18-81d1-47bf-8a70-4f76c3c413e4
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
