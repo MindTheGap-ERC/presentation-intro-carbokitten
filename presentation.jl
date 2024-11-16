@@ -168,6 +168,9 @@ md"""
 ## Carbonate Platform
 """
 
+# ╔═╡ 1b0a59fb-85cb-4091-8893-4088aafb9761
+md"""##"""
+
 # ╔═╡ d3f8125a-7b59-4ac4-94f1-61fce8903b4b
 md"""
 ## Question 1
@@ -205,6 +208,7 @@ $(LocalResource("./fig/SealevelBahamas.jpg"))
 
 # ╔═╡ 7d7033f1-0443-410d-8e73-62eabb53ea9c
 md"""
+## Think about this...
 ### You are only able to see, what stratigraphy allows you to see.
 $(LocalResource("fig/Lightcolor.png"))
 **Stratigraphy is like the colored light here.**
@@ -212,6 +216,7 @@ $(LocalResource("fig/Lightcolor.png"))
 
 # ╔═╡ 6b5d1935-0773-4933-ae56-b5b88b81f87e
 md"""
+## So...
 ### The key is to know what color is the light!
 **If we know the behaviour of stratigraphy, are we able to reconstruct the original information?**
 $(LocalResource("fig/WhyFM.jpg"))
@@ -363,30 +368,36 @@ When the carbonates are subaerially exposed, they undergo denudation (dissolutio
 A handful of studies incorporate up-to-date knowledge from landscape evolution into carbonate platform denudation.
 
 We can use three ways to simulated denudation:
+- Dissolution
+- Physical Erosion
+- Emperical regression
 
 """
 
 # ╔═╡ a00ef21a-dee2-49b3-8cef-ba03313ae8c1
-md"""### Dissolution
+md"""
+
+## Dissolution
 
 - Kinetic rate law
 $$F = \alpha (c_{eq}-c(z))$$
 $$D_{\rm average} = (I\times \frac{c_{eq}}{\rho})\ (1 – (\frac{\lambda}{z_0})\ (1 – e^{(\frac{-z_0}{\lambda})}))$$
+
 $(LocalResource("fig/Dis.png"))
 """
 
 # ╔═╡ d1bc6120-b769-4394-9a46-946c00f533df
 md""" 
-### Physical erosion
+## Physical erosion
 - Distribute sediments to neighboring cells based on slope.
 $$D_{phys} = -k_v * (1 - I_f)^{1/3} |\nabla h|^{2/3}$$
 $(LocalResource("fig/Ero.png"))
-*Source: van Der Wiel et al., 2007
+*Source: van Der Wiel et al., 2007*
 """
 
 # ╔═╡ e6234d9e-e212-4c3e-b3a0-58a918bd1ccf
 md"""
-### Regression from Cl isotope observations
+## Regression from Cl isotope observations
 - $$D = P × S$$
 """
 
@@ -458,18 +469,19 @@ $(LocalResource("./fig/Bahamabank.jpg", :height=>400))
 
 # ╔═╡ fe8d2c6e-a124-4561-8864-e40cf00ca177
 TwoColumn(md"""
-## Complexity
+**Complexity**
 
 - Not Just Transportation (Physics is easy!)
 - Carbonate Production, i.e. Biology
 
-## Time scales
+**Time scales**
 
 - Single events (hours to days): Storms
 - Decades: Dynamics of ecology
 - Kiloyears: Milankovitch cycles
 - Megayears: Evolution
-""", md"""
+""", 
+md"""
 $(LocalResource("./fig/MilankovitchCyclesOrbitandCores.png"))
 [By Incredio - Own work, CC BY 3.0](https://commons.wikimedia.org/w/index.php?curid=6930545)
 """, 50)
@@ -2577,20 +2589,21 @@ version = "1.4.1+1"
 # ╟─02c49ad8-8a82-456a-9374-d21042bb1bc1
 # ╟─f7b4113e-16fe-4833-95f7-e38fccaa38b7
 # ╟─1e51f9c8-4b45-481d-9d55-868e5dec7690
-# ╠═e3d5f8db-8df4-4a94-a7d6-fdd7a63b828b
-# ╠═dc6d8d67-91b1-45ab-b7b0-996b752112bf
+# ╟─e3d5f8db-8df4-4a94-a7d6-fdd7a63b828b
+# ╟─dc6d8d67-91b1-45ab-b7b0-996b752112bf
+# ╟─1b0a59fb-85cb-4091-8893-4088aafb9761
 # ╟─fe8d2c6e-a124-4561-8864-e40cf00ca177
 # ╟─d3f8125a-7b59-4ac4-94f1-61fce8903b4b
 # ╟─741bbf64-5b80-4e5c-b53e-98d756d68ef6
 # ╟─7d7033f1-0443-410d-8e73-62eabb53ea9c
-# ╟─6b5d1935-0773-4933-ae56-b5b88b81f87e
+# ╠═6b5d1935-0773-4933-ae56-b5b88b81f87e
 # ╟─3dd47c47-2e3a-4970-982d-b1c2eb9cfdd7
 # ╟─e9754cdc-1180-4bc5-b87c-a11d659d33aa
 # ╟─0fd4f511-af9d-45b3-9878-edd331d741e0
 # ╟─3f16dfb2-bc9e-4f69-8405-215f3099498f
 # ╟─8bae0730-f7bb-4b4e-9aef-98a749f5ff6a
 # ╟─0cacd700-cf55-4a97-85a8-f9f40855a7e7
-# ╠═e036e6cd-253a-43e5-bea5-c8eae9947ab7
+# ╟─e036e6cd-253a-43e5-bea5-c8eae9947ab7
 # ╠═bb797b6f-47c2-4ebc-a096-ed2e8cd0b9ff
 # ╟─6f6fa95d-b163-4cc6-ab3c-9bc86083d54d
 # ╟─afa830cf-f4ce-442d-9649-3e912893052c
@@ -2609,11 +2622,10 @@ version = "1.4.1+1"
 # ╟─a0066da2-bf7a-410e-8684-3899609b5e01
 # ╟─99476a07-99e2-4d5d-84d9-313c4d52bc16
 # ╟─cd7142f8-443d-4b8c-971c-7a480bbde06d
-# ╠═a00ef21a-dee2-49b3-8cef-ba03313ae8c1
-# ╠═d1bc6120-b769-4394-9a46-946c00f533df
+# ╟─a00ef21a-dee2-49b3-8cef-ba03313ae8c1
+# ╟─d1bc6120-b769-4394-9a46-946c00f533df
 # ╟─e6234d9e-e212-4c3e-b3a0-58a918bd1ccf
-# ╠═c92b69a9-3f28-4f4f-9825-a64826b81895
-# ╟─72a62273-9b25-487b-a0f1-79e91dd37a0d
+# ╟─c92b69a9-3f28-4f4f-9825-a64826b81895
 # ╟─1f0f95b1-9a82-47f8-ac48-2d3c56471daa
 # ╟─a382876a-f900-4f1b-955b-a4a3aca79be5
 # ╟─85992544-7b70-4cc4-9d98-621ac54370a6
