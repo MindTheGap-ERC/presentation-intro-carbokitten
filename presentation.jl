@@ -390,15 +390,6 @@ md"""
 - $$D = P × S$$
 """
 
-# ╔═╡ 72a62273-9b25-487b-a0f1-79e91dd37a0d
-md"""
-## eScience byproducts
-
-- Extensive use of Entangled.
-- `ModuleMixins.jl` a Julia package for combining modules hierarchically.
-- `GraphvizDotLang.jl` EDSL for Graphviz output.
-"""
-
 # ╔═╡ 1f0f95b1-9a82-47f8-ac48-2d3c56471daa
 md"""
 # Practical
