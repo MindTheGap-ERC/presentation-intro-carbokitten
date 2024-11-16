@@ -263,9 +263,9 @@ md"""
 md"""
 ## Forward modelling
 
-- set initial geometry
-- codify state
-- quantify mutation by processes
+- Set initial geometry
+- Codify state
+- Quantify mutation by processes
 """
 
 # ╔═╡ bb797b6f-47c2-4ebc-a096-ed2e8cd0b9ff
@@ -275,11 +275,11 @@ md"""
 
 $$\partial_t h = -g_m {\rm tanh}\left[\frac{I_0}{I_k} \exp(-k (h - s(t)))\right].$$
 
-- initial geometry
+- Initial geometry
   * initial topography: $h(t=t_0) = h_0$
   * sea-level (including subsidence): $s(t)$
-- state: $h(t)$
-- mutation: $\partial_t h$
+- State: $h(t)$
+- Mutation: $\partial_t h$
 """
 
 # ╔═╡ 6f6fa95d-b163-4cc6-ab3c-9bc86083d54d
@@ -292,7 +292,7 @@ md"# CarboKitten.jl"
 
 # ╔═╡ 6fe8d06c-1419-4e6b-8585-db51f9f2b761
 md"""
-## CarboKitten in short
+## CarboKitten.jl in short
 
 - Rewrite of CarboCAT
 - Julia
@@ -369,7 +369,7 @@ We can use three ways to simulated denudation:
 # ╔═╡ a00ef21a-dee2-49b3-8cef-ba03313ae8c1
 md"""### Dissolution
 
-- kinetic rate law
+- Kinetic rate law
 $$F = \alpha (c_{eq}-c(z))$$
 $$D_{\rm average} = (I\times \frac{c_{eq}}{\rho})\ (1 – (\frac{\lambda}{z_0})\ (1 – e^{(\frac{-z_0}{\lambda})}))$$
 $(LocalResource("fig/Dis.png"))
@@ -410,8 +410,8 @@ md"""
 The cells below are not part of the presentation. Add things here that are need to run the notebook.
 
 In the markdown:
-- use level-1 headers (single `#`) for a new chapter
-- use level-2 headers (double `##`) for a new slide
+- Use level-1 headers (single `#`) for a new chapter
+- Use level-2 headers (double `##`) for a new slide
 """
 
 # ╔═╡ 85992544-7b70-4cc4-9d98-621ac54370a6
@@ -474,10 +474,10 @@ TwoColumn(md"""
 
 ## Time scales
 
-- single events (hours to days): storms
-- decades: dynamics of ecology
-- kiloyears: Milankovitch cycles
-- megayears: evolution
+- Single events (hours to days): Storms
+- Decades: Dynamics of ecology
+- Kiloyears: Milankovitch cycles
+- Megayears: Evolution
 """, md"""
 $(LocalResource("./fig/MilankovitchCyclesOrbitandCores.png"))
 [By Incredio - Own work, CC BY 3.0](https://commons.wikimedia.org/w/index.php?curid=6930545)
@@ -2586,12 +2586,12 @@ version = "1.4.1+1"
 # ╟─02c49ad8-8a82-456a-9374-d21042bb1bc1
 # ╟─f7b4113e-16fe-4833-95f7-e38fccaa38b7
 # ╟─1e51f9c8-4b45-481d-9d55-868e5dec7690
-# ╟─e3d5f8db-8df4-4a94-a7d6-fdd7a63b828b
-# ╟─dc6d8d67-91b1-45ab-b7b0-996b752112bf
+# ╠═e3d5f8db-8df4-4a94-a7d6-fdd7a63b828b
+# ╠═dc6d8d67-91b1-45ab-b7b0-996b752112bf
 # ╟─fe8d2c6e-a124-4561-8864-e40cf00ca177
 # ╟─d3f8125a-7b59-4ac4-94f1-61fce8903b4b
 # ╟─741bbf64-5b80-4e5c-b53e-98d756d68ef6
-# ╠═7d7033f1-0443-410d-8e73-62eabb53ea9c
+# ╟─7d7033f1-0443-410d-8e73-62eabb53ea9c
 # ╟─6b5d1935-0773-4933-ae56-b5b88b81f87e
 # ╟─3dd47c47-2e3a-4970-982d-b1c2eb9cfdd7
 # ╟─e9754cdc-1180-4bc5-b87c-a11d659d33aa
@@ -2599,8 +2599,8 @@ version = "1.4.1+1"
 # ╟─3f16dfb2-bc9e-4f69-8405-215f3099498f
 # ╟─8bae0730-f7bb-4b4e-9aef-98a749f5ff6a
 # ╟─0cacd700-cf55-4a97-85a8-f9f40855a7e7
-# ╟─e036e6cd-253a-43e5-bea5-c8eae9947ab7
-# ╟─bb797b6f-47c2-4ebc-a096-ed2e8cd0b9ff
+# ╠═e036e6cd-253a-43e5-bea5-c8eae9947ab7
+# ╠═bb797b6f-47c2-4ebc-a096-ed2e8cd0b9ff
 # ╟─6f6fa95d-b163-4cc6-ab3c-9bc86083d54d
 # ╟─afa830cf-f4ce-442d-9649-3e912893052c
 # ╟─40a80600-17de-4012-a8bf-4635485144ef
