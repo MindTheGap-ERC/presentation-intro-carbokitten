@@ -169,7 +169,7 @@ md"""
 """
 
 # ╔═╡ 1b0a59fb-85cb-4091-8893-4088aafb9761
-md"""##"""
+md"""## Why this is hard"""
 
 # ╔═╡ d3f8125a-7b59-4ac4-94f1-61fce8903b4b
 md"""
@@ -210,7 +210,7 @@ $(LocalResource("./fig/SealevelBahamas.jpg"))
 md"""
 ## Think about this...
 ### You are only able to see, what stratigraphy allows you to see.
-$(LocalResource("fig/Lightcolor.png"))
+$(LocalResource("fig/lightcolor.png"))
 **Stratigraphy is like the colored light here.**
 """
 
@@ -351,6 +351,28 @@ summary_plot(cap_output)
 
 # ╔═╡ dcabbeb1-4384-4841-b26c-213887feba61
 md"## Active Layer Diffusion"
+
+# ╔═╡ 042b5bf9-5c77-436a-be74-d3949b2f84f2
+md"""
+## Slide of unnecessary detail
+
+- Sediment flux: ${\bf q}_f = -\nu_f C_f {\bf \nabla} h$, where $C_f$ is concentration of entrained sediment and $\nu_f$ is a diffusion rate.
+- Instead of concentration $C_f$, use production $P_f$ directly.
+- Insert the flux into the mass balance:
+
+  $$\sigma + \partial_t h = -\sum_f ({\bf \nabla} \cdot {\bf q}_f + P_f)$$
+
+- And take the result for each single facies:
+
+  $$\partial_t h_f = {\bf \nabla} \cdot \big[ \nu_f\ C_f\ {\bf \nabla} h \big] + P_f,$$
+"""
+
+# ╔═╡ 8916e66a-2f60-479d-bce9-f4f505e6ef31
+md"""
+## Sediment Buffer
+
+$(LocalResource("fig/sediment-buffer.svg"))
+"""
 
 # ╔═╡ a0066da2-bf7a-410e-8684-3899609b5e01
 md"""
@@ -528,7 +550,7 @@ TwoColumn(md"""
 
   $$\partial_t h_f = {\bf \nabla} \cdot \big[ \nu_f\ P_f\ {\bf \nabla} h \big] + P_f,$$
 
-  where $P_f$ includes sediment in the **active layer** and new **production**.
+  where $P_f$ includes the rate of **production** and **disintegration**.
 """,
 md"""
 $(LocalResource("fig/active-layer-export.svg"))
@@ -1022,9 +1044,9 @@ version = "2.2.8"
 
 [[deps.Expat_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "cc5231d52eb1771251fbd37171dbc408bcc8a1b6"
+git-tree-sha1 = "1c6317308b9dc757616f0b5cb379db10494443a7"
 uuid = "2e619515-83b5-522b-bb60-26c02a35a201"
-version = "2.6.4+0"
+version = "2.6.2+0"
 
 [[deps.Extents]]
 git-tree-sha1 = "81023caa0021a41712685887db1fc03db26f41f5"
@@ -2360,9 +2382,9 @@ version = "1.6.1"
 
 [[deps.XML2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Libiconv_jll", "Zlib_jll"]
-git-tree-sha1 = "a2fccc6559132927d4c5dc183e3e01048c6dcbd6"
+git-tree-sha1 = "6a451c6f33a176150f315726eba8b92fbfdb9ae7"
 uuid = "02c8fc9c-b97f-50b9-bbe4-9be30ff0a78a"
-version = "2.13.5+0"
+version = "2.13.4+0"
 
 [[deps.XSLT_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Libgcrypt_jll", "Libgpg_error_jll", "Libiconv_jll", "XML2_jll", "Zlib_jll"]
@@ -2596,7 +2618,7 @@ version = "1.4.1+1"
 # ╟─d3f8125a-7b59-4ac4-94f1-61fce8903b4b
 # ╟─741bbf64-5b80-4e5c-b53e-98d756d68ef6
 # ╟─7d7033f1-0443-410d-8e73-62eabb53ea9c
-# ╠═6b5d1935-0773-4933-ae56-b5b88b81f87e
+# ╟─6b5d1935-0773-4933-ae56-b5b88b81f87e
 # ╟─3dd47c47-2e3a-4970-982d-b1c2eb9cfdd7
 # ╟─e9754cdc-1180-4bc5-b87c-a11d659d33aa
 # ╟─0fd4f511-af9d-45b3-9878-edd331d741e0
@@ -2604,7 +2626,7 @@ version = "1.4.1+1"
 # ╟─8bae0730-f7bb-4b4e-9aef-98a749f5ff6a
 # ╟─0cacd700-cf55-4a97-85a8-f9f40855a7e7
 # ╟─e036e6cd-253a-43e5-bea5-c8eae9947ab7
-# ╠═bb797b6f-47c2-4ebc-a096-ed2e8cd0b9ff
+# ╟─bb797b6f-47c2-4ebc-a096-ed2e8cd0b9ff
 # ╟─6f6fa95d-b163-4cc6-ab3c-9bc86083d54d
 # ╟─afa830cf-f4ce-442d-9649-3e912893052c
 # ╟─40a80600-17de-4012-a8bf-4635485144ef
@@ -2618,7 +2640,9 @@ version = "1.4.1+1"
 # ╟─2df751f2-0a2a-42d7-9d0f-3db4af3a8f5d
 # ╠═f14d4f60-75c0-4c75-acb1-8de730aaf952
 # ╟─dcabbeb1-4384-4841-b26c-213887feba61
-# ╠═86219909-5970-47fd-aad6-0d2698d5cdd3
+# ╟─86219909-5970-47fd-aad6-0d2698d5cdd3
+# ╟─042b5bf9-5c77-436a-be74-d3949b2f84f2
+# ╟─8916e66a-2f60-479d-bce9-f4f505e6ef31
 # ╟─a0066da2-bf7a-410e-8684-3899609b5e01
 # ╟─99476a07-99e2-4d5d-84d9-313c4d52bc16
 # ╟─cd7142f8-443d-4b8c-971c-7a480bbde06d
