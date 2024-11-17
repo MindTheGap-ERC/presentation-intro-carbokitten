@@ -4,7 +4,7 @@
 #> [frontmatter]
 #> title = "CarboKitten.jl"
 #> date = "2024-11-18"
-#> description = "stratographic modeling in Julia"
+#> description = "stratigraphic modeling in Julia"
 #> 
 #>     [[frontmatter.author]]
 #>     name = "Johan Hidding"
@@ -161,10 +161,6 @@ $(PlutoUI.LocalResource.(["./fig/erc.png", "./fig/uu.png", "./fig/nlesc.png"], :
 # ╔═╡ 1e51f9c8-4b45-481d-9d55-868e5dec7690
 md"""
 # Scientific Motivation
-
-## Carbonate Sediments
-
-$(LocalResource("./fig/carbs.jpg", :height=>400))
 """
 
 # ╔═╡ e3d5f8db-8df4-4a94-a7d6-fdd7a63b828b
@@ -172,48 +168,26 @@ md"""
 ## Carbonate Platform
 """
 
-# ╔═╡ fe8d2c6e-a124-4561-8864-e40cf00ca177
-md"""
-## Complexity
-
-- Not Just Transportation (Physics is easy!)
-- Carbonate Production, i.e. Biology
-
-## Time scales
-
-- single events: storms
-- seconds: wave induced transport
-- hours: tides
-- years: seasons
-- decades: dynamics of ecology
-"""
-
-#= """
-**Carbonate sediments cover a significant area of present-day shallow marine, and make up 20% to 25% of sedimentary rocks.**
-
-This makes carbonate an important target to study. As a geoscientist, investigating the deposition of carbonate sediments over Myr scale is especially interesting. For example, the growth of reef island. However, carbonate sedimentary system is notoriously complex to study. This is because their deposition not only controlled by physical transportation (as silicalsitc sediments do), but also strogly dependent on carbonate production which biology-related. 
-
-""" =#
-
-# ╔═╡ 00dd6fe1-b3f8-43cd-b021-48a6c1fe2bb4
-md"## Time scales (continued)"
+# ╔═╡ 1b0a59fb-85cb-4091-8893-4088aafb9761
+md"""##"""
 
 # ╔═╡ d3f8125a-7b59-4ac4-94f1-61fce8903b4b
 md"""
 ## Question 1
 
-**How would incomplete stratigraphy bias our interpretation?**
+**How does incomplete stratigraphy bias our interpretation?**
 
 $(LocalResource("./fig/CambrianLimestone.JPG", :height=>400))
 *foto: Xianyi Liu*
 
-- Cambrian Explosion?
+- Information: Cambrian Explosion?
+- Can you see an unconformity?
 """
 
 #=
 Stratigraphy is an essential archive to study the past of the Earth.
-![Cambrian Fujunshan formation (limestine) overlies on Qingbaikou formation precambiran limestone](fig/CambrianLimestone.JPG)
-- This figure shows the the uncomformity between PreCambrain limestone and Cambrian limestone. In the lower part, only single-cell algae fossils were found, while in the upper Cambian formation, it is possible to find trilobite (multicellular organism). This is an evidence for Cambrian Explosion.
+![Cambrian Fujunshan Formation (limestone) overlies on Qingbaikou Formation Precambiran limestone](fig/CambrianLimestone.JPG)
+- This figure shows the the unconformity between Precambrian limestone and Cambrian limestone. In the lower part, only single-cell algae fossils were found, while in the upper, Cambrian, Formation, it is possible to find trilobites (multicellular organism). This is evidence for Cambrian Explosion.
 
 *Source: Xianyi Liu*
 =#
@@ -222,8 +196,9 @@ Stratigraphy is an essential archive to study the past of the Earth.
 md"""
 ## Incomplete Stratigraphy
 
-- Not all information are recorded!
-- Bahamas: no deposition for 95% of time! 
+- Not all information is recorded
+
+- Bahamas: no deposition for 95% of time 
 
 $(LocalResource("./fig/SealevelBahamas.jpg"))
 
@@ -231,14 +206,31 @@ $(LocalResource("./fig/SealevelBahamas.jpg"))
 """
 
 
+# ╔═╡ 7d7033f1-0443-410d-8e73-62eabb53ea9c
+md"""
+## Think about this...
+### You are only able to see, what stratigraphy allows you to see.
+$(LocalResource("fig/Lightcolor.png"))
+**Stratigraphy is like the colored light here.**
+"""
+
+# ╔═╡ 6b5d1935-0773-4933-ae56-b5b88b81f87e
+md"""
+## So...
+### The key is to know what color is the light!
+**If we know the behaviour of stratigraphy, are we able to reconstruct the original information?**
+$(LocalResource("fig/WhyFM.jpg"))
+**How? Use forward modeling to understand the stratigraphy.**
+"""
+
 # ╔═╡ 3dd47c47-2e3a-4970-982d-b1c2eb9cfdd7
 md"""
 ## Question 2
-**What determines the shape of a carbonate reef?**
+**What determines the shape of a carbonate reef? Can we use forward model to answer the question?**
 
 $(LocalResource("fig/CarbonatePlatformShape.gif"))
 
-*Source: Den Bosence, 2005*
+*Source: Dan Bosence, 2005*
 """
 
 # ╔═╡ e9754cdc-1180-4bc5-b87c-a11d659d33aa
@@ -253,12 +245,12 @@ md"""
 
 # ╔═╡ 8bae0730-f7bb-4b4e-9aef-98a749f5ff6a
 #= md"""
-## The Incompleteness may substantially bias our interpretations 
-**If we ignored the fact that the stratigraphy incomplete, our interpretations based on the information from incomplete stratigraphy might deleiver a faulty result, but fortunetely the forward model may help us spot the bias out**
+## Incompleteness may substantially bias our interpretations 
+**If we ignored the fact that the stratigraphy is incomplete, our interpretations based on the information from incomplete stratigraphy might deliver a faulty result, but fortunately the forward model may help us spot the bias out**
 
 ![Faulty interpretation on trait evolution](fig/PartTraitEvolution.jpg)
 
-- This figure shows that the incomplete stratigraphy (from a forward model) would bias our interpretation of mode of evolution towards "punctuated mode". 
+- This figure shows that the incomplete stratigraphy (from a forward model) would bias our interpretation of mode of evolution towards a punctuated mode. 
 
 *Source: Hohmann et al., 2024*
 """ =#
@@ -276,9 +268,9 @@ md"""
 md"""
 ## Forward modelling
 
-- set initial geometry
-- codify state
-- quantify mutation by processes
+- Set initial geometry
+- Codify state
+- Quantify mutation by processes
 """
 
 # ╔═╡ bb797b6f-47c2-4ebc-a096-ed2e8cd0b9ff
@@ -288,11 +280,11 @@ md"""
 
 $$\partial_t h = -g_m {\rm tanh}\left[\frac{I_0}{I_k} \exp(-k (h - s(t)))\right].$$
 
-- initial geometry
+- Initial geometry
   * initial topography: $h(t=t_0) = h_0$
   * sea-level (including subsidence): $s(t)$
-- state: $h(t)$
-- mutation: $\partial_t h$
+- State: $h(t)$
+- Mutation: $\partial_t h$
 """
 
 # ╔═╡ 6f6fa95d-b163-4cc6-ab3c-9bc86083d54d
@@ -305,7 +297,7 @@ md"# CarboKitten.jl"
 
 # ╔═╡ 6fe8d06c-1419-4e6b-8585-db51f9f2b761
 md"""
-## CarboKitten in short
+## CarboKitten.jl in short
 
 - Rewrite of CarboCAT
 - Julia
@@ -351,7 +343,7 @@ end
 
 # ╔═╡ 2df751f2-0a2a-42d7-9d0f-3db4af3a8f5d
 md"""
-## CA Driven Production
+## CA-Driven Production
 """
 
 # ╔═╡ f14d4f60-75c0-4c75-acb1-8de730aaf952
@@ -368,13 +360,45 @@ md"""
 # ╔═╡ 99476a07-99e2-4d5d-84d9-313c4d52bc16
 summary_plot(alcap_output)
 
-# ╔═╡ 72a62273-9b25-487b-a0f1-79e91dd37a0d
+# ╔═╡ cd7142f8-443d-4b8c-971c-7a480bbde06d
 md"""
-## eScience byproducts
+## Denudation
+When the carbonates are subaerially exposed, they undergo denudation (dissolution + erosion).
 
-- Extensive use of Entangled.
-- `ModuleMixins.jl` a Julia package for combining modules hierarchically.
-- `GraphvizDotLang.jl` EDSL for Graphviz output.
+A handful of studies incorporate up-to-date knowledge from landscape evolution into carbonate platform denudation.
+
+We can use three ways to simulated denudation:
+- Dissolution
+- Physical Erosion
+- Emperical regression
+
+"""
+
+# ╔═╡ a00ef21a-dee2-49b3-8cef-ba03313ae8c1
+md"""
+
+## Dissolution
+
+- Kinetic rate law
+$$F = \alpha (c_{eq}-c(z))$$
+$$D_{\rm average} = (I\times \frac{c_{eq}}{\rho})\ (1 – (\frac{\lambda}{z_0})\ (1 – e^{(\frac{-z_0}{\lambda})}))$$
+
+$(LocalResource("fig/Dis.png"))
+"""
+
+# ╔═╡ d1bc6120-b769-4394-9a46-946c00f533df
+md""" 
+## Physical erosion
+- Distribute sediments to neighboring cells based on slope.
+$$D_{phys} = -k_v * (1 - I_f)^{1/3} |\nabla h|^{2/3}$$
+$(LocalResource("fig/Ero.png"))
+*Source: van Der Wiel et al., 2007*
+"""
+
+# ╔═╡ e6234d9e-e212-4c3e-b3a0-58a918bd1ccf
+md"""
+## Regression from Cl isotope observations
+- $$D = P × S$$
 """
 
 # ╔═╡ 1f0f95b1-9a82-47f8-ac48-2d3c56471daa
@@ -388,8 +412,8 @@ md"""
 The cells below are not part of the presentation. Add things here that are need to run the notebook.
 
 In the markdown:
-- use level-1 headers (single `#`) for a new chapter
-- use level-2 headers (double `##`) for a new slide
+- Use level-1 headers (single `#`) for a new chapter
+- Use level-2 headers (double `##`) for a new slide
 """
 
 # ╔═╡ 85992544-7b70-4cc4-9d98-621ac54370a6
@@ -419,8 +443,8 @@ TwoColumn(md"""
 **stratigraphic modelling in Julia**
 
 - Johan Hidding (Netherlands eScience Center)
-- Xianyi Liu (Utrecht University, dep. Geoscience)
-- prof. Emilia Jarochowska (Utrecht University, dep. Geoscience)
+- Xianyi Liu (Utrecht University, Dept. of Earth Sciences)
+- Emilia Jarochowska (Utrecht University, Dept. of Earth Sciences)
 
 Utrecht, November 18, 2024
 """, PlutoUI.LocalResource("./fig/mind-the-gap.png", :width=>200), 70)
@@ -435,6 +459,7 @@ TwoColumn(md"""
   - Bivalve
 - Light intensity (water depth)
 - Topography
+...
 """,
 md"""
 Bahama Bank
@@ -442,14 +467,31 @@ $(LocalResource("./fig/Bahamabank.jpg", :height=>400))
 [By NASA](http://www.ioccg.org/gallery/bahamabank.html) ([Public Domain](https://commons.wikimedia.org/w/index.php?curid=4279073))
 """, 50)
 
-# ╔═╡ fd2bf45e-8c01-4b75-b981-a8f06a0ef05b
+# ╔═╡ fe8d2c6e-a124-4561-8864-e40cf00ca177
 TwoColumn(md"""
-- kiloyears: Milankovitch cycles
-- megayears: evolution
-""", md"""
+**Complexity**
+
+- Not Just Transportation (Physics is easy!)
+- Carbonate Production, i.e. Biology
+
+**Time scales**
+
+- Single events (hours to days): Storms
+- Decades: Dynamics of ecology
+- Kiloyears: Milankovitch cycles
+- Megayears: Evolution
+""", 
+md"""
 $(LocalResource("./fig/MilankovitchCyclesOrbitandCores.png"))
 [By Incredio - Own work, CC BY 3.0](https://commons.wikimedia.org/w/index.php?curid=6930545)
 """, 50)
+
+#= """
+**Carbonate sediments cover a significant area of present-day shallow marine, and make up 20% to 25% of sedimentary rocks.**
+
+This makes carbonate an important target to study. As a geoscientist, investigating the deposition of carbonate sediments over Myr scale is especially interesting. For example, the growth of reef island. However, carbonate sedimentary system is notoriously complex to study. This is because their deposition not only controlled by physical transportation (as siliciclastic sediments do), but also strongly dependent on carbonate production which biology-related. 
+
+""" =#
 
 # ╔═╡ 3f16dfb2-bc9e-4f69-8405-215f3099498f
 TwoColumn(md"""
@@ -491,6 +533,11 @@ TwoColumn(md"""
 md"""
 $(LocalResource("fig/active-layer-export.svg"))
 """, 50)
+
+# ╔═╡ c92b69a9-3f28-4f4f-9825-a64826b81895
+
+TwoColumn(md"""$(LocalResource("fig/Precipitation-Denudation.svg"))""",md"""$(LocalResource("fig/Slope-Denudation.svg"))""",50)
+
 
 # ╔═╡ aa20619b-fe16-4b01-9532-8f6c6277d399
 bs92_output = let
@@ -555,16 +602,6 @@ Loess = "4345ca2d-374a-55d4-8d30-97f9976e7612"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 SmoothingSplines = "102930c3-cf33-599f-b3b1-9a29a5acab30"
 Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
-
-[compat]
-CarboKitten = "~0.3.0"
-GLMakie = "~0.10.16"
-GraphvizDotLang = "~0.2.1"
-Interpolations = "~0.15.1"
-Loess = "~0.6.4"
-PlutoUI = "~0.7.60"
-SmoothingSplines = "~0.3.2"
-Unitful = "~1.21.0"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -573,7 +610,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.11.1"
 manifest_format = "2.0"
-project_hash = "e456ea3d9e793217ac4d0e7818cc96aaf933204e"
+project_hash = "9056af254f6a9ca6abfeadb4499e4284f03164b6"
 
 [[deps.AbstractFFTs]]
 deps = ["LinearAlgebra"]
@@ -985,9 +1022,9 @@ version = "2.2.8"
 
 [[deps.Expat_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "1c6317308b9dc757616f0b5cb379db10494443a7"
+git-tree-sha1 = "cc5231d52eb1771251fbd37171dbc408bcc8a1b6"
 uuid = "2e619515-83b5-522b-bb60-26c02a35a201"
-version = "2.6.2+0"
+version = "2.6.4+0"
 
 [[deps.Extents]]
 git-tree-sha1 = "81023caa0021a41712685887db1fc03db26f41f5"
@@ -2323,9 +2360,9 @@ version = "1.6.1"
 
 [[deps.XML2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Libiconv_jll", "Zlib_jll"]
-git-tree-sha1 = "6a451c6f33a176150f315726eba8b92fbfdb9ae7"
+git-tree-sha1 = "a2fccc6559132927d4c5dc183e3e01048c6dcbd6"
 uuid = "02c8fc9c-b97f-50b9-bbe4-9be30ff0a78a"
-version = "2.13.4+0"
+version = "2.13.5+0"
 
 [[deps.XSLT_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Libgcrypt_jll", "Libgpg_error_jll", "Libiconv_jll", "XML2_jll", "Zlib_jll"]
@@ -2554,11 +2591,12 @@ version = "1.4.1+1"
 # ╟─1e51f9c8-4b45-481d-9d55-868e5dec7690
 # ╟─e3d5f8db-8df4-4a94-a7d6-fdd7a63b828b
 # ╟─dc6d8d67-91b1-45ab-b7b0-996b752112bf
+# ╟─1b0a59fb-85cb-4091-8893-4088aafb9761
 # ╟─fe8d2c6e-a124-4561-8864-e40cf00ca177
-# ╟─00dd6fe1-b3f8-43cd-b021-48a6c1fe2bb4
-# ╟─fd2bf45e-8c01-4b75-b981-a8f06a0ef05b
 # ╟─d3f8125a-7b59-4ac4-94f1-61fce8903b4b
 # ╟─741bbf64-5b80-4e5c-b53e-98d756d68ef6
+# ╟─7d7033f1-0443-410d-8e73-62eabb53ea9c
+# ╠═6b5d1935-0773-4933-ae56-b5b88b81f87e
 # ╟─3dd47c47-2e3a-4970-982d-b1c2eb9cfdd7
 # ╟─e9754cdc-1180-4bc5-b87c-a11d659d33aa
 # ╟─0fd4f511-af9d-45b3-9878-edd331d741e0
@@ -2566,7 +2604,7 @@ version = "1.4.1+1"
 # ╟─8bae0730-f7bb-4b4e-9aef-98a749f5ff6a
 # ╟─0cacd700-cf55-4a97-85a8-f9f40855a7e7
 # ╟─e036e6cd-253a-43e5-bea5-c8eae9947ab7
-# ╟─bb797b6f-47c2-4ebc-a096-ed2e8cd0b9ff
+# ╠═bb797b6f-47c2-4ebc-a096-ed2e8cd0b9ff
 # ╟─6f6fa95d-b163-4cc6-ab3c-9bc86083d54d
 # ╟─afa830cf-f4ce-442d-9649-3e912893052c
 # ╟─40a80600-17de-4012-a8bf-4635485144ef
@@ -2580,10 +2618,14 @@ version = "1.4.1+1"
 # ╟─2df751f2-0a2a-42d7-9d0f-3db4af3a8f5d
 # ╠═f14d4f60-75c0-4c75-acb1-8de730aaf952
 # ╟─dcabbeb1-4384-4841-b26c-213887feba61
-# ╟─86219909-5970-47fd-aad6-0d2698d5cdd3
+# ╠═86219909-5970-47fd-aad6-0d2698d5cdd3
 # ╟─a0066da2-bf7a-410e-8684-3899609b5e01
 # ╟─99476a07-99e2-4d5d-84d9-313c4d52bc16
-# ╟─72a62273-9b25-487b-a0f1-79e91dd37a0d
+# ╟─cd7142f8-443d-4b8c-971c-7a480bbde06d
+# ╟─a00ef21a-dee2-49b3-8cef-ba03313ae8c1
+# ╟─d1bc6120-b769-4394-9a46-946c00f533df
+# ╟─e6234d9e-e212-4c3e-b3a0-58a918bd1ccf
+# ╟─c92b69a9-3f28-4f4f-9825-a64826b81895
 # ╟─1f0f95b1-9a82-47f8-ac48-2d3c56471daa
 # ╟─a382876a-f900-4f1b-955b-a4a3aca79be5
 # ╟─85992544-7b70-4cc4-9d98-621ac54370a6
