@@ -226,11 +226,9 @@ $(LocalResource("fig/WhyFM.jpg"))
 # ╔═╡ 3dd47c47-2e3a-4970-982d-b1c2eb9cfdd7
 md"""
 ## Question 2
-**What determines the shape of a carbonate reef? Can we use forward model to answer the question?**
+**If the stratigraphy is incomplete, how much astronomical signals would you expect to be preserved?**
 
-$(LocalResource("fig/CarbonatePlatformShape.gif"))
-
-*Source: Dan Bosence, 2005*
+Please bear in mind, and we may study this in practice later!
 """
 
 # ╔═╡ e9754cdc-1180-4bc5-b87c-a11d659d33aa
@@ -2626,7 +2624,7 @@ version = "1.4.1+1"
 # ╟─741bbf64-5b80-4e5c-b53e-98d756d68ef6
 # ╟─7d7033f1-0443-410d-8e73-62eabb53ea9c
 # ╟─6b5d1935-0773-4933-ae56-b5b88b81f87e
-# ╟─3dd47c47-2e3a-4970-982d-b1c2eb9cfdd7
+# ╠═3dd47c47-2e3a-4970-982d-b1c2eb9cfdd7
 # ╟─e9754cdc-1180-4bc5-b87c-a11d659d33aa
 # ╟─0fd4f511-af9d-45b3-9878-edd331d741e0
 # ╟─3f16dfb2-bc9e-4f69-8405-215f3099498f
