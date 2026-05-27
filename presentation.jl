@@ -28,6 +28,114 @@ macro bind(def, element)
     #! format: on
 end
 
+# ╔═╡ 0dbd9cce-a006-11ef-365b-d388b63f5339
+begin
+	using PlutoUI
+	using GLMakie
+	using Unitful
+	using CarboKitten
+	using GraphvizDotLang
+	TableOfContents()
+end
+
+# ╔═╡ 771e87fa-4ee7-4c66-b71f-7fbc99505f7c
+begin
+	using CarboKitten.Models: BS92
+	using CarboKitten: DataSets
+	using CarboKitten.Visualization: summary_plot
+end
+
+# ╔═╡ c510433d-23d7-45f4-8df8-85f896f15173
+cap_output = let
+	using CarboKitten.Models: CAP
+	
+	FACIES = [
+	    CAP.Facies(
+        maximum_growth_rate = 500u"m/Myr",
+        extinction_coefficient = 0.8u"m^-1",
+        saturation_intensity = 60u"W/m^2"),
+
+	    CAP.Facies(
+        maximum_growth_rate = 400u"m/Myr",
+        extinction_coefficient = 0.1u"m^-1",
+        saturation_intensity = 60u"W/m^2"),
+
+	    CAP.Facies(
+        maximum_growth_rate = 100u"m/Myr",
+        extinction_coefficient = 0.005u"m^-1",
+        saturation_intensity = 60u"W/m^2")
+	]
+
+	function sea_level(t)
+		10.0u"m" * sin(2π * t / 0.3u"Myr") + 3.0u"m" * sin(2π * t / 0.05u"Myr")
+	end
+	
+	INPUT = CAP.Input(
+		tag = "cap1",
+		box = CarboKitten.Box{Coast}(grid_size=(100, 50), phys_scale=150.0u"m"),
+		time = TimeProperties(
+			Δt = 200.0u"yr",
+			steps = 5000),
+		output = Dict(:full => OutputSpec(write_interval=10)),
+		sea_level = sea_level,
+		initial_topography = (x, y) -> - x / 300.0,
+		subsidence_rate = 50.0u"m/Myr",
+		insolation = 400.0u"W/m^2",
+		facies = FACIES)
+
+	run_model(Model{CAP}, INPUT, "cap.h5")
+end
+
+# ╔═╡ d775081d-733c-4d0a-ab33-f721d8074604
+alcap_output = let
+	using CarboKitten.Models: ALCAP
+	
+	FACIES = [
+	    ALCAP.Facies(
+            production = BenthicProduction(
+                maximum_growth_rate = 500u"m/Myr",
+                extinction_coefficient = 0.8u"m^-1",
+                saturation_intensity = 60u"W/m^2"),
+		    transport_coefficient = 10u"m/Myr"),
+
+	    ALCAP.Facies(
+            production = BenthicProduction(
+                maximum_growth_rate = 400u"m/Myr",
+                extinction_coefficient = 0.1u"m^-1",
+                saturation_intensity = 60u"W/m^2"),
+		    transport_coefficient = 2.5u"m/Myr"),
+
+	    ALCAP.Facies(
+            production = BenthicProduction(
+                maximum_growth_rate = 100u"m/Myr",
+                extinction_coefficient = 0.005u"m^-1",
+                saturation_intensity = 60u"W/m^2"),
+		    transport_coefficient = 5u"m/Myr")
+	]
+
+	function sea_level(t)
+		10.0u"m" * sin(2π * t / 0.3u"Myr") + 3.0u"m" * sin(2π * t / 0.05u"Myr")
+	end
+	
+	INPUT = ALCAP.Input(
+		tag = "cap1",
+		box = CarboKitten.Box{Coast}(grid_size=(100, 50), phys_scale=150.0u"m"),
+		time = TimeProperties(
+			Δt = 200.0u"yr",
+			steps = 5000),
+		output = Dict(:full => OutputSpec(write_interval=10)),
+		sea_level = sea_level,
+		initial_topography = (x, y) -> - x / 300.0,
+		subsidence_rate = 50.0u"m/Myr",
+		insolation = 400.0u"W/m^2",
+		facies = FACIES,
+		depositional_resolution = 0.5u"m",
+		sediment_buffer_size = 50,
+		disintegration_rate = 50.0u"m/Myr")
+
+	run_model(Model{ALCAP}, INPUT, "alcap.h5")
+end
+
 # ╔═╡ eba9dfe7-1ba9-4937-b4c4-439fb521ff15
 html"""
 <button onclick="present()">Toggle Presentation</button>
@@ -218,16 +326,16 @@ We need an open-source carbonate platform forward model! And here we will show e
 =#
 
 # ╔═╡ 8bae0730-f7bb-4b4e-9aef-98a749f5ff6a
-#= md"""
+md"""
 ## Incompleteness may substantially bias our interpretations 
-**If we ignored the fact that the stratigraphy is incomplete, our interpretations based on the information from incomplete stratigraphy might deliver a faulty result, but fortunately the forward model may help us spot the bias out**
+**If we ignore the fact that the stratigraphy is incomplete, our interpretations based on the information from incomplete stratigraphy might deliver a faulty result, but fortunately the forward model may help us spot the bias out**
 
 ![Faulty interpretation on trait evolution](fig/PartTraitEvolution.jpg)
 
 - This figure shows that the incomplete stratigraphy (from a forward model) would bias our interpretation of mode of evolution towards a punctuated mode. 
 
 *Source: Hohmann et al., 2024*
-""" =#
+"""
 
 
 # ╔═╡ d12d3e20-4fc3-4240-8f3b-95c520117740
@@ -266,7 +374,12 @@ md"""
 """
 
 # ╔═╡ afa830cf-f4ce-442d-9649-3e912893052c
+let
+using CarboKitten
+using CarboKitten.Visualization: summary_plot
+
 summary_plot(bs92_output)
+end
 
 # ╔═╡ 5c2d4e05-b8b7-416f-b56d-c9b73ab72858
 TwoColumn(md"""

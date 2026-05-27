@@ -1,2 +1,6 @@
 [deps]
+CarboKitten = "690c6d5c-626a-429f-a06b-981a1dae1c19"
+GraphvizDotLang = "6039e64d-d8b8-4c93-8e43-7efd2f757352"
 Pluto = "c3e4b0f8-55cb-11ea-2926-15256bba5781"
+PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
+Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
