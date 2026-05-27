@@ -225,6 +225,8 @@ $(LocalResource("fig/lightcolor.png"))
   ╠═╡ =#
 
 # ╔═╡ 6b5d1935-0773-4933-ae56-b5b88b81f87e
+# ╠═╡ disabled = true
+#=╠═╡
 md"""
 ## So...
 ### The key is to know what color is the light!
@@ -232,23 +234,22 @@ md"""
 $(LocalResource("fig/WhyFM.jpg"))
 **How? Use forward modeling to understand the stratigraphy.**
 """
+  ╠═╡ =#
 
 # ╔═╡ 3dd47c47-2e3a-4970-982d-b1c2eb9cfdd7
+# ╠═╡ disabled = true
+#=╠═╡
 md"""
 ## Question 2
 **If the stratigraphy is incomplete, how much astronomical signals would you expect to be preserved?**
 
 Please bear in mind, and we may study this in practice later!
 """
+  ╠═╡ =#
 
 # ╔═╡ e9754cdc-1180-4bc5-b87c-a11d659d33aa
 md"""
-# Forward Model 
-"""
-
-# ╔═╡ 0fd4f511-af9d-45b3-9878-edd331d741e0
-md"""
-## Existing Software
+# Towards a FOSS carbonate stratigraphic forward model 
 """
 
 # ╔═╡ 8bae0730-f7bb-4b4e-9aef-98a749f5ff6a
@@ -264,21 +265,10 @@ md"""
 """ =#
 
 
-# ╔═╡ 0cacd700-cf55-4a97-85a8-f9f40855a7e7
-md"""
-## Previous work
+# ╔═╡ d12d3e20-4fc3-4240-8f3b-95c520117740
+md"""## CarboKitten's architecture
 
-- Bosscher & Schlager 1992: carbonate production model
-- Burgess 2013: bio-surrogate model
-"""
-
-# ╔═╡ e036e6cd-253a-43e5-bea5-c8eae9947ab7
-md"""
-## Forward modelling
-
-- Set initial geometry
-- Codify state
-- Quantify mutation by processes
+$(LocalResource("./fig/flowchart.png"))
 """
 
 # ╔═╡ bb797b6f-47c2-4ebc-a096-ed2e8cd0b9ff
@@ -538,13 +528,14 @@ This makes carbonate an important target to study. As a geoscientist, investigat
 
 # ╔═╡ 3f16dfb2-bc9e-4f69-8405-215f3099498f
 TwoColumn(md"""
+## Existing Software
+		  
 Not open source:
 - CARBONATE 3D
 - CARB3D+
 - DionisosFlow
 
-Matlab:
-- CarboCAT (Burgess 2013)
+Our starting point: CarboCAT (Burgess 2013) - more OS than others but still in Matlab and no version control, slow
 """,
 md"""
 $(LocalResource("./fig/oil.jpg"))
@@ -2676,20 +2667,18 @@ version = "1.13.0+0"
 # ╟─f7b4113e-16fe-4833-95f7-e38fccaa38b7
 # ╠═1e51f9c8-4b45-481d-9d55-868e5dec7690
 # ╠═e3d5f8db-8df4-4a94-a7d6-fdd7a63b828b
-# ╠═dc6d8d67-91b1-45ab-b7b0-996b752112bf
+# ╟─dc6d8d67-91b1-45ab-b7b0-996b752112bf
 # ╟─1b0a59fb-85cb-4091-8893-4088aafb9761
-# ╠═fe8d2c6e-a124-4561-8864-e40cf00ca177
-# ╠═d3f8125a-7b59-4ac4-94f1-61fce8903b4b
+# ╟─fe8d2c6e-a124-4561-8864-e40cf00ca177
+# ╟─d3f8125a-7b59-4ac4-94f1-61fce8903b4b
 # ╠═741bbf64-5b80-4e5c-b53e-98d756d68ef6
 # ╠═7d7033f1-0443-410d-8e73-62eabb53ea9c
-# ╟─6b5d1935-0773-4933-ae56-b5b88b81f87e
+# ╠═6b5d1935-0773-4933-ae56-b5b88b81f87e
 # ╠═3dd47c47-2e3a-4970-982d-b1c2eb9cfdd7
-# ╟─e9754cdc-1180-4bc5-b87c-a11d659d33aa
-# ╟─0fd4f511-af9d-45b3-9878-edd331d741e0
-# ╟─3f16dfb2-bc9e-4f69-8405-215f3099498f
-# ╟─8bae0730-f7bb-4b4e-9aef-98a749f5ff6a
-# ╟─0cacd700-cf55-4a97-85a8-f9f40855a7e7
-# ╟─e036e6cd-253a-43e5-bea5-c8eae9947ab7
+# ╠═e9754cdc-1180-4bc5-b87c-a11d659d33aa
+# ╠═3f16dfb2-bc9e-4f69-8405-215f3099498f
+# ╠═8bae0730-f7bb-4b4e-9aef-98a749f5ff6a
+# ╠═d12d3e20-4fc3-4240-8f3b-95c520117740
 # ╟─bb797b6f-47c2-4ebc-a096-ed2e8cd0b9ff
 # ╟─6f6fa95d-b163-4cc6-ab3c-9bc86083d54d
 # ╟─afa830cf-f4ce-442d-9649-3e912893052c
