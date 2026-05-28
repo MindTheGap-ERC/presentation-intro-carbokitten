@@ -369,16 +369,15 @@ summary_plot(alcap_output)
 
 # ╔═╡ cd7142f8-443d-4b8c-971c-7a480bbde06d
 md"""
-## Denudation
-When the carbonates are subaerially exposed, they undergo denudation (dissolution + erosion).
+# Denudation
+When carbonates are subaerially exposed, they undergo denudation (dissolution + erosion).
 
 A handful of studies incorporate up-to-date knowledge from landscape evolution into carbonate platform denudation.
 
-We can use three ways to simulated denudation:
-- Dissolution
+We use three approaches to simulate denudation:
+- Chemical dissolution
 - Physical Erosion
-- Emperical regression
-
+- Empirical rates derived from regression over Cl isotopes
 """
 
 # ╔═╡ a00ef21a-dee2-49b3-8cef-ba03313ae8c1
@@ -386,7 +385,8 @@ md"""
 
 ## Dissolution
 
-- Kinetic rate law
+Kinetic rate law
+
 $$F = \alpha (c_{eq}-c(z))$$
 $$D_{\rm average} = (I\times \frac{c_{eq}}{\rho})\ (1 – (\frac{\lambda}{z_0})\ (1 – e^{(\frac{-z_0}{\lambda})}))$$
 
@@ -396,7 +396,8 @@ $(LocalResource("fig/Dis.png"))
 # ╔═╡ d1bc6120-b769-4394-9a46-946c00f533df
 md""" 
 ## Physical erosion
-- Distribute sediments to neighboring cells based on slope.
+Distribute sediments to neighboring cells based on slope.
+
 $$D_{phys} = -k_v * (1 - I_f)^{1/3} |\nabla h|^{2/3}$$
 $(LocalResource("fig/Ero.png"))
 *Source: van Der Wiel et al., 2007*
@@ -405,13 +406,13 @@ $(LocalResource("fig/Ero.png"))
 # ╔═╡ e6234d9e-e212-4c3e-b3a0-58a918bd1ccf
 md"""
 ## Regression from Cl isotope observations
-- $$D = P × S$$
+$$D = P × S$$
 """
 
 # ╔═╡ d4a4270c-5323-40e0-83c8-25f1fca65b00
 md"""
 # Modern cases study from the Bahamas
-The modelling of facies heterogeneity is primarily based on Cellular Automata principle, and indrectly influenced by external forcings. To test whether the model could capture the same degree of heterogeneity or not, we will use modern observed data to validate our model.
+Modelling of facies heterogeneity is achieved using Cellular Automata and indrectly accounts for external forcing. To test whether CarboKitten captures the same degree of heterogeneity, we used modern observed data.
 
 $(LocalResource("fig/Joulters_cay.jpg"))
 """
@@ -419,17 +420,21 @@ $(LocalResource("fig/Joulters_cay.jpg"))
 # ╔═╡ b6b58248-d1ef-49ae-96b3-2f36567a9ca2
 md"""
 ## Habitat mapping
-We chose the images from 1945 and interprete its habitat distribution, and compare it to the 2019 satellite images.
+We chose the images from 1945, interpreted the habitat distribution, and compared it to the same habitats in 2019 satellite images.
 
 $(LocalResource("fig/Joulters_habitat.png"))
 """
 
 # ╔═╡ 5d83cb24-86b5-44dc-b4e2-81d12666cabf
 md"""
-## Measuring the heterogeneity
-Here we use a proxy called 'spatial entropy (SE)' to measure the 2D heterogeneity. The defination is presented below. Where `DisCon` means: Number of dissimilar facies connections and `TotCon` means: Total connections.
+## Measuring spatial heterogeneity
+Here we use a proxy called *spatial entropy* (SE) to measure the 2D heterogeneity. The definition is presented below. 
 
-**This work is on-going... **
+`DisCon` - Number of dissimilar facies connections 
+
+`TotCon` - Total number of connections
+
+**Manuscript submitted - ongoing work**
 
 
 $$SE = DisCon / TotCon$$
@@ -670,7 +675,7 @@ Unitful = "~1.28.0"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.12.6"
+julia_version = "1.12.5"
 manifest_format = "2.0"
 project_hash = "3d65d13e00137bde0a4daec24bc204eadc105db5"
 
@@ -2750,11 +2755,11 @@ version = "1.13.0+0"
 # ╟─cd7142f8-443d-4b8c-971c-7a480bbde06d
 # ╟─a00ef21a-dee2-49b3-8cef-ba03313ae8c1
 # ╟─d1bc6120-b769-4394-9a46-946c00f533df
-# ╠═e6234d9e-e212-4c3e-b3a0-58a918bd1ccf
-# ╠═c92b69a9-3f28-4f4f-9825-a64826b81895
-# ╠═d4a4270c-5323-40e0-83c8-25f1fca65b00
-# ╠═b6b58248-d1ef-49ae-96b3-2f36567a9ca2
-# ╠═5d83cb24-86b5-44dc-b4e2-81d12666cabf
+# ╟─e6234d9e-e212-4c3e-b3a0-58a918bd1ccf
+# ╟─c92b69a9-3f28-4f4f-9825-a64826b81895
+# ╟─d4a4270c-5323-40e0-83c8-25f1fca65b00
+# ╟─b6b58248-d1ef-49ae-96b3-2f36567a9ca2
+# ╟─5d83cb24-86b5-44dc-b4e2-81d12666cabf
 # ╟─289c9bc6-8627-46cd-b07d-820a9f86855d
 # ╟─1f0f95b1-9a82-47f8-ac48-2d3c56471daa
 # ╟─a382876a-f900-4f1b-955b-a4a3aca79be5
