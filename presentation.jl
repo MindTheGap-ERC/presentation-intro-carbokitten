@@ -114,6 +114,16 @@ md"""
 $(PlutoUI.LocalResource.(["./fig/erc.png", "./fig/uu.png", "./fig/nlesc.png"], :height => 80)...)
 """
 
+# ╔═╡ 98138204-672e-4856-8412-3829cb2fa793
+md"""
+## Carbonate Platforms
+"""
+
+# ╔═╡ 636dbfe6-e4d5-4251-88e9-50282d0d614f
+md"""
+## Why this is hard
+"""
+
 # ╔═╡ d3f8125a-7b59-4ac4-94f1-61fce8903b4b
 # ╠═╡ disabled = true
 #=╠═╡
@@ -195,6 +205,11 @@ md"""
 # Towards a FOSS carbonate stratigraphic forward model 
 """
 
+# ╔═╡ db6fadc9-4552-4a69-8bf3-3bae69c329dd
+md"""
+## Existing Software
+"""
+
 # ╔═╡ 8bae0730-f7bb-4b4e-9aef-98a749f5ff6a
 md"""
 ## Incompleteness may substantially bias our interpretations 
@@ -221,7 +236,7 @@ Our flagship features:
 # ╔═╡ d12d3e20-4fc3-4240-8f3b-95c520117740
 md"""## CarboKitten's architecture
 
-$(LocalResource("./fig/flowchart.png"))
+$(LocalResource("./fig/flowchart.svg"))
 """
 
 # ╔═╡ bb797b6f-47c2-4ebc-a096-ed2e8cd0b9ff
@@ -243,6 +258,11 @@ md"""
 ## Reproducing BS92
 
 $(LocalResource("./fig/BS92.png"))
+"""
+
+# ╔═╡ 5b17e7e3-9ba8-45d7-81b6-935f4e6c7c58
+md"""
+# Cellular automaton 
 """
 
 # ╔═╡ dc828c07-7650-41ca-87b0-ca71378eecf2
@@ -286,7 +306,6 @@ md"""
 ## Slide of unnecessary detail
 
 - Sediment flux: ${\bf q}_f = -\nu_f C_f {\bf \nabla} h$, where $C_f$ is concentration of entrained sediment and $\nu_f$ is a diffusion rate.
-- Instead of concentration $C_f$, use production $P_f$ directly.
 - Insert the flux into the mass balance:
 
   $$\sigma + \partial_t h = -\sum_f ({\bf \nabla} \cdot {\bf q}_f + P_f)$$
@@ -392,9 +411,7 @@ Utrecht, May 28, 2026
 """, PlutoUI.LocalResource("./fig/mind-the-gap.png", :width=>200), 70)
 
 # ╔═╡ dc6d8d67-91b1-45ab-b7b0-996b752112bf
-TwoColumn(md"""
-## Carbonate Platforms
-          
+TwoColumn(md"""          
 **Primary control over sediment production:**
 
 - Biomineralizing organisms
@@ -415,8 +432,6 @@ $(LocalResource("./fig/Bahamabank.jpg", :height=>400))
 
 # ╔═╡ fe8d2c6e-a124-4561-8864-e40cf00ca177
 TwoColumn(md"""
-## Why this is hard
-	
 **Complexity**
 
 - Not just transport
@@ -446,8 +461,6 @@ This makes carbonate an important target to study. As a geoscientist, investigat
 
 # ╔═╡ 3f16dfb2-bc9e-4f69-8405-215f3099498f
 TwoColumn(md"""
-## Existing Software
-		  
 Not open source:
 - CARBONATE 3D
 - CARB3D+
@@ -465,8 +478,6 @@ We need an open-source carbonate platform forward model! And here we will show e
 
 # ╔═╡ 5c2d4e05-b8b7-416f-b56d-c9b73ab72858
 TwoColumn(md"""
-# Cellular automaton 
-		  
 - Dispersal, facilitation, competition
 - Not the actual biological process, but useful heuristic
 - Unique ruleset: infinite heterogeneity (never converges on a fixed distribution)
@@ -2603,7 +2614,9 @@ version = "1.13.0+0"
 # ╟─c25f2a9f-f7c1-41f6-b4ac-03b19377a6e6
 # ╟─02c49ad8-8a82-456a-9374-d21042bb1bc1
 # ╟─f7b4113e-16fe-4833-95f7-e38fccaa38b7
+# ╟─98138204-672e-4856-8412-3829cb2fa793
 # ╟─dc6d8d67-91b1-45ab-b7b0-996b752112bf
+# ╟─636dbfe6-e4d5-4251-88e9-50282d0d614f
 # ╟─fe8d2c6e-a124-4561-8864-e40cf00ca177
 # ╟─d3f8125a-7b59-4ac4-94f1-61fce8903b4b
 # ╟─741bbf64-5b80-4e5c-b53e-98d756d68ef6
@@ -2611,13 +2624,15 @@ version = "1.13.0+0"
 # ╟─6b5d1935-0773-4933-ae56-b5b88b81f87e
 # ╟─3dd47c47-2e3a-4970-982d-b1c2eb9cfdd7
 # ╟─e9754cdc-1180-4bc5-b87c-a11d659d33aa
+# ╟─db6fadc9-4552-4a69-8bf3-3bae69c329dd
 # ╟─3f16dfb2-bc9e-4f69-8405-215f3099498f
 # ╟─8bae0730-f7bb-4b4e-9aef-98a749f5ff6a
 # ╟─40a80600-17de-4012-a8bf-4635485144ef
-# ╟─d12d3e20-4fc3-4240-8f3b-95c520117740
+# ╠═d12d3e20-4fc3-4240-8f3b-95c520117740
 # ╟─bb797b6f-47c2-4ebc-a096-ed2e8cd0b9ff
 # ╟─6f6fa95d-b163-4cc6-ab3c-9bc86083d54d
 # ╟─afa830cf-f4ce-442d-9649-3e912893052c
+# ╟─5b17e7e3-9ba8-45d7-81b6-935f4e6c7c58
 # ╟─5c2d4e05-b8b7-416f-b56d-c9b73ab72858
 # ╟─dc828c07-7650-41ca-87b0-ca71378eecf2
 # ╟─a4edb5e9-995c-42eb-89f8-d7f85dfb8dc1
@@ -2625,7 +2640,7 @@ version = "1.13.0+0"
 # ╟─f9d9216c-53ab-4878-8701-8877f2ee3dcb
 # ╟─dcabbeb1-4384-4841-b26c-213887feba61
 # ╟─86219909-5970-47fd-aad6-0d2698d5cdd3
-# ╟─042b5bf9-5c77-436a-be74-d3949b2f84f2
+# ╠═042b5bf9-5c77-436a-be74-d3949b2f84f2
 # ╟─8916e66a-2f60-479d-bce9-f4f505e6ef31
 # ╟─a0066da2-bf7a-410e-8684-3899609b5e01
 # ╠═99476a07-99e2-4d5d-84d9-313c4d52bc16
