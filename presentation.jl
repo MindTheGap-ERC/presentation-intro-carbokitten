@@ -544,8 +544,10 @@ This makes carbonate an important target to study. As a geoscientist, investigat
 """ =#
 
 # ╔═╡ 3f16dfb2-bc9e-4f69-8405-215f3099498f
+begin
+md"""## Existing Software"""
 TwoColumn(md"""
-## Existing Software
+
 		  
 Not open source:
 - CARBONATE 3D
@@ -561,6 +563,7 @@ $(LocalResource("./fig/oil.jpg"))
 #=
 We need an open-source carbonate platform forward model! And here we will show examples of utilising this model to answer two questions in geology.
 =#
+end
 
 # ╔═╡ 5c2d4e05-b8b7-416f-b56d-c9b73ab72858
 TwoColumn(md"""
@@ -2713,9 +2716,9 @@ version = "1.13.0+0"
 
 # ╔═╡ Cell order:
 # ╟─eba9dfe7-1ba9-4937-b4c4-439fb521ff15
-# ╠═c25f2a9f-f7c1-41f6-b4ac-03b19377a6e6
+# ╟─c25f2a9f-f7c1-41f6-b4ac-03b19377a6e6
 # ╠═c2a91309-290f-4a7f-874a-f570c7f0992e
-# ╠═02c49ad8-8a82-456a-9374-d21042bb1bc1
+# ╟─02c49ad8-8a82-456a-9374-d21042bb1bc1
 # ╟─f7b4113e-16fe-4833-95f7-e38fccaa38b7
 # ╟─726a44e0-819e-44d5-ac52-b03ca052e3e8
 # ╟─e32ba22a-034f-430f-83ce-1774a26b7429
@@ -2727,7 +2730,7 @@ version = "1.13.0+0"
 # ╟─6b5d1935-0773-4933-ae56-b5b88b81f87e
 # ╟─3dd47c47-2e3a-4970-982d-b1c2eb9cfdd7
 # ╟─e9754cdc-1180-4bc5-b87c-a11d659d33aa
-# ╟─3f16dfb2-bc9e-4f69-8405-215f3099498f
+# ╠═3f16dfb2-bc9e-4f69-8405-215f3099498f
 # ╟─8bae0730-f7bb-4b4e-9aef-98a749f5ff6a
 # ╟─40a80600-17de-4012-a8bf-4635485144ef
 # ╟─d12d3e20-4fc3-4240-8f3b-95c520117740
