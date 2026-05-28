@@ -35,6 +35,7 @@ begin
 	using Unitful
 	using CarboKitten
 	using GraphvizDotLang
+	using Loess
 	TableOfContents()
 end
 
@@ -44,47 +45,6 @@ begin
 	using CarboKitten: DataSets
 	using CarboKitten.Visualization: summary_plot
 	using Interpolations: linear_interpolation
-end
-
-# ╔═╡ c510433d-23d7-45f4-8df8-85f896f15173
-cap_output = let
-	using CarboKitten.Models: CAP
-	
-	FACIES = [
-	    CAP.Facies(
-        maximum_growth_rate = 500u"m/Myr",
-        extinction_coefficient = 0.8u"m^-1",
-        saturation_intensity = 60u"W/m^2"),
-
-	    CAP.Facies(
-        maximum_growth_rate = 400u"m/Myr",
-        extinction_coefficient = 0.1u"m^-1",
-        saturation_intensity = 60u"W/m^2"),
-
-	    CAP.Facies(
-        maximum_growth_rate = 100u"m/Myr",
-        extinction_coefficient = 0.005u"m^-1",
-        saturation_intensity = 60u"W/m^2")
-	]
-
-	function sea_level(t)
-		10.0u"m" * sin(2π * t / 0.3u"Myr") + 3.0u"m" * sin(2π * t / 0.05u"Myr")
-	end
-	
-	INPUT = CAP.Input(
-		tag = "cap1",
-		box = CarboKitten.Box{Coast}(grid_size=(100, 50), phys_scale=150.0u"m"),
-		time = TimeProperties(
-			Δt = 200.0u"yr",
-			steps = 5000),
-		output = Dict(:full => OutputSpec(write_interval=10)),
-		sea_level = sea_level,
-		initial_topography = (x, y) -> - x / 300.0,
-		subsidence_rate = 50.0u"m/Myr",
-		insolation = 400.0u"W/m^2",
-		facies = FACIES)
-
-	run_model(Model{CAP}, INPUT, "cap.h5")
 end
 
 # ╔═╡ d775081d-733c-4d0a-ab33-f721d8074604
@@ -97,21 +57,21 @@ alcap_output = let
                 maximum_growth_rate = 500u"m/Myr",
                 extinction_coefficient = 0.8u"m^-1",
                 saturation_intensity = 60u"W/m^2"),
-		    transport_coefficient = 10u"m/Myr"),
+		    transport_coefficient = 50u"m/yr"),
 
 	    ALCAP.Facies(
             production = BenthicProduction(
                 maximum_growth_rate = 400u"m/Myr",
                 extinction_coefficient = 0.1u"m^-1",
                 saturation_intensity = 60u"W/m^2"),
-		    transport_coefficient = 2.5u"m/Myr"),
+		    transport_coefficient = 25.0u"m/yr"),
 
 	    ALCAP.Facies(
             production = BenthicProduction(
                 maximum_growth_rate = 100u"m/Myr",
                 extinction_coefficient = 0.005u"m^-1",
                 saturation_intensity = 60u"W/m^2"),
-		    transport_coefficient = 5u"m/Myr")
+		    transport_coefficient = 12.5u"m/yr")
 	]
 
 	function sea_level(t)
@@ -124,7 +84,8 @@ alcap_output = let
 		time = TimeProperties(
 			Δt = 200.0u"yr",
 			steps = 5000),
-		output = Dict(:full => OutputSpec(write_interval=10)),
+		output = Dict(:full => OutputSpec(write_interval=10),
+            :profile => OutputSpec(slice=(:,25))),
 		sea_level = sea_level,
 		initial_topography = (x, y) -> - x / 300.0,
 		subsidence_rate = 50.0u"m/Myr",
@@ -132,7 +93,8 @@ alcap_output = let
 		facies = FACIES,
 		depositional_resolution = 0.5u"m",
 		sediment_buffer_size = 50,
-		disintegration_rate = 50.0u"m/Myr")
+		disintegration_rate = 50.0u"m/Myr",
+        lithification_time=100.0u"yr")
 
 	run_model(Model{ALCAP}, INPUT, "alcap.h5")
 end
@@ -316,14 +278,6 @@ let
 	fig
 end
 
-# ╔═╡ 2df751f2-0a2a-42d7-9d0f-3db4af3a8f5d
-md"""
-## CA-Driven Production
-"""
-
-# ╔═╡ f14d4f60-75c0-4c75-acb1-8de730aaf952
-summary_plot(cap_output)
-
 # ╔═╡ dcabbeb1-4384-4841-b26c-213887feba61
 md"## Active Layer Diffusion"
 
@@ -424,23 +378,6 @@ In the markdown:
 md"""
 - [Docs on writing slides in Pluto](https://www.andreaskroepelin.de/blog/plutoslides/)
 """
-
-# ╔═╡ 6ee4b02a-2d84-465c-970b-4fc8c44c33fd
-begin
-	@kwdef struct TwoColumn{L, R}
-	    left::L
-	    right::R
-		fraction::Int=50
-	end
-	
-	function Base.show(io, mime::MIME"text/html", tc::TwoColumn)
-	    write(io, """<div style="display: flex;"><div style="flex: $(tc.fraction)%; margin-right: 10pt;">""")
-	    show(io, mime, tc.left)
-	    write(io, """</div><div style="flex: $(100 - tc.fraction)%;">""")
-	    show(io, mime, tc.right)
-	    write(io, """</div></div>""")
-	end
-end
 
 # ╔═╡ 02c49ad8-8a82-456a-9374-d21042bb1bc1
 TwoColumn(md"""
@@ -592,7 +529,7 @@ summary_plot(bs92_output)
 
 # ╔═╡ 3f86f55e-e56b-41b1-bff5-f05eeda0fbdf
 model = let
-	df = miller_2020()
+	df = DataSets.miller_2020()
 	ldf = df[df.refkey .== "846 Lisiecki", :]
 	loess(ldf.time |> in_units_of(u"Myr"), ldf.sealevel |> in_units_of(u"m"), span=0.005)
 end
@@ -609,6 +546,31 @@ let
 	fig
 end
 
+# ╔═╡ 6ee4b02a-2d84-465c-970b-4fc8c44c33fd
+# ╠═╡ disabled = true
+#=╠═╡
+begin
+	@kwdef struct TwoColumn{L, R}
+	    left::L
+	    right::R
+		fraction::Int=50
+	end
+	
+	function Base.show(io, mime::MIME"text/html", tc::TwoColumn)
+	    write(io, """<div style="display: flex;"><div style="flex: $(tc.fraction)%; margin-right: 10pt;">""")
+	    show(io, mime, tc.left)
+	    write(io, """</div><div style="flex: $(100 - tc.fraction)%;">""")
+	    show(io, mime, tc.right)
+	    write(io, """</div></div>""")
+	end
+end
+  ╠═╡ =#
+
+# ╔═╡ b47fb5cf-1a5d-4e78-821e-c247794ba65b
+function TwoColumn(left, right, frac)
+	PlutoUI.ExperimentalLayout.grid([left right])
+end
+
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
@@ -616,6 +578,7 @@ CarboKitten = "690c6d5c-626a-429f-a06b-981a1dae1c19"
 GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
 GraphvizDotLang = "6039e64d-d8b8-4c93-8e43-7efd2f757352"
 Interpolations = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
+Loess = "4345ca2d-374a-55d4-8d30-97f9976e7612"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 
@@ -624,6 +587,7 @@ CarboKitten = "~0.6.0"
 GLMakie = "~0.13.9"
 GraphvizDotLang = "~0.2.1"
 Interpolations = "~0.16.2"
+Loess = "~0.6.5"
 PlutoUI = "~0.7.60"
 Unitful = "~1.28.0"
 """
@@ -632,9 +596,9 @@ Unitful = "~1.28.0"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.12.5"
+julia_version = "1.12.6"
 manifest_format = "2.0"
-project_hash = "aba0e37bd79b47be0e2a440fd697e1cae0bdf5b1"
+project_hash = "b4f755476d374819fdae47cab927162d1af4053b"
 
 [[deps.AbstractFFTs]]
 deps = ["LinearAlgebra"]
@@ -945,6 +909,17 @@ deps = ["Mmap"]
 git-tree-sha1 = "9e2f36d3c96a820c678f2f1f1782582fcf685bae"
 uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 version = "1.9.1"
+
+[[deps.Distances]]
+deps = ["LinearAlgebra", "Statistics", "StatsAPI"]
+git-tree-sha1 = "c7e3a542b999843086e2f29dac96a618c105be1d"
+uuid = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"
+version = "0.10.12"
+weakdeps = ["ChainRulesCore", "SparseArrays"]
+
+    [deps.Distances.extensions]
+    DistancesChainRulesCoreExt = "ChainRulesCore"
+    DistancesSparseArraysExt = "SparseArrays"
 
 [[deps.Distributed]]
 deps = ["Random", "Serialization", "Sockets"]
@@ -1559,6 +1534,12 @@ version = "2.42.0+0"
 deps = ["Libdl", "OpenBLAS_jll", "libblastrampoline_jll"]
 uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 version = "1.12.0"
+
+[[deps.Loess]]
+deps = ["Distances", "LinearAlgebra", "Statistics", "StatsAPI", "StatsFuns"]
+git-tree-sha1 = "b1ad83b367b915e2dc485dee3d62a6a6317d7ad4"
+uuid = "4345ca2d-374a-55d4-8d30-97f9976e7612"
+version = "0.6.5"
 
 [[deps.LogExpFunctions]]
 deps = ["DocStringExtensions", "IrrationalConstants", "LinearAlgebra"]
@@ -2642,14 +2623,12 @@ version = "1.13.0+0"
 # ╟─a4edb5e9-995c-42eb-89f8-d7f85dfb8dc1
 # ╟─e0e0bc64-c691-471e-8594-ccdf352887f4
 # ╟─f9d9216c-53ab-4878-8701-8877f2ee3dcb
-# ╟─2df751f2-0a2a-42d7-9d0f-3db4af3a8f5d
-# ╠═f14d4f60-75c0-4c75-acb1-8de730aaf952
 # ╟─dcabbeb1-4384-4841-b26c-213887feba61
 # ╟─86219909-5970-47fd-aad6-0d2698d5cdd3
 # ╟─042b5bf9-5c77-436a-be74-d3949b2f84f2
 # ╟─8916e66a-2f60-479d-bce9-f4f505e6ef31
 # ╟─a0066da2-bf7a-410e-8684-3899609b5e01
-# ╟─99476a07-99e2-4d5d-84d9-313c4d52bc16
+# ╠═99476a07-99e2-4d5d-84d9-313c4d52bc16
 # ╟─cd7142f8-443d-4b8c-971c-7a480bbde06d
 # ╟─a00ef21a-dee2-49b3-8cef-ba03313ae8c1
 # ╟─d1bc6120-b769-4394-9a46-946c00f533df
@@ -2662,8 +2641,8 @@ version = "1.13.0+0"
 # ╠═0dbd9cce-a006-11ef-365b-d388b63f5339
 # ╠═771e87fa-4ee7-4c66-b71f-7fbc99505f7c
 # ╠═6ee4b02a-2d84-465c-970b-4fc8c44c33fd
+# ╠═b47fb5cf-1a5d-4e78-821e-c247794ba65b
 # ╠═aa20619b-fe16-4b01-9532-8f6c6277d399
-# ╠═c510433d-23d7-45f4-8df8-85f896f15173
 # ╠═d775081d-733c-4d0a-ab33-f721d8074604
 # ╠═3f86f55e-e56b-41b1-bff5-f05eeda0fbdf
 # ╠═9cf75959-90ec-4cd2-8c00-a95a2ffb1340
