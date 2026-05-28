@@ -357,6 +357,41 @@ md"""
 # ╔═╡ 99476a07-99e2-4d5d-84d9-313c4d52bc16
 summary_plot(alcap_output)
 
+# ╔═╡ dbaff53b-0fc3-4886-ad53-ae1cc1faa7bc
+md"""
+# Visualization
+
+$(LocalResource("fig/alcaps-alternative.png"))
+"""
+
+# ╔═╡ da9142a3-e966-4d36-b2e7-a559d233292e
+md"""
+### Sediment profile
+
+$(LocalResource("fig/profile_fraction.png"))
+"""
+
+# ╔═╡ bf8a9983-f8e2-4640-b6eb-d3e5ce9aa317
+md"""
+### Wheeler diagram
+
+$(LocalResource("fig/wheeler_diagram.png"))
+"""
+
+# ╔═╡ 1ccdb93b-33a5-441e-86b1-ab2b1e085ad5
+md"""
+### Age-depth model
+
+$(LocalResource("fig/adm.png"))
+"""
+
+# ╔═╡ cc443da5-fbbe-473f-aa8a-a526cc37fce5
+md"""
+### Topography
+
+$(LocalResource("fig/glamour_view.png"))
+"""
+
 # ╔═╡ cd7142f8-443d-4b8c-971c-7a480bbde06d
 md"""
 ## Denudation
@@ -550,6 +585,19 @@ TwoColumn(md"""
 md"""
 $(LocalResource("fig/active-layer-export.svg"))
 """, 50)
+
+# ╔═╡ 9db54abf-52b0-4884-9d69-30e3ea9507ea
+TwoColumn(md"""
+## Types of diagrams
+
+- Sediment profile
+- Stratigraphic column
+- Age-depth model
+- Wheeler (chronostratigraphic) diagram
+- Topography plots""",
+md"""
+$(LocalResource("fig/strat_col.png"))
+""",50)
 
 # ╔═╡ c92b69a9-3f28-4f4f-9825-a64826b81895
 
@@ -2645,11 +2693,17 @@ version = "1.13.0+0"
 # ╟─2df751f2-0a2a-42d7-9d0f-3db4af3a8f5d
 # ╠═f14d4f60-75c0-4c75-acb1-8de730aaf952
 # ╟─dcabbeb1-4384-4841-b26c-213887feba61
-# ╟─86219909-5970-47fd-aad6-0d2698d5cdd3
+# ╠═86219909-5970-47fd-aad6-0d2698d5cdd3
 # ╟─042b5bf9-5c77-436a-be74-d3949b2f84f2
-# ╟─8916e66a-2f60-479d-bce9-f4f505e6ef31
+# ╠═8916e66a-2f60-479d-bce9-f4f505e6ef31
 # ╟─a0066da2-bf7a-410e-8684-3899609b5e01
-# ╟─99476a07-99e2-4d5d-84d9-313c4d52bc16
+# ╠═99476a07-99e2-4d5d-84d9-313c4d52bc16
+# ╟─dbaff53b-0fc3-4886-ad53-ae1cc1faa7bc
+# ╟─9db54abf-52b0-4884-9d69-30e3ea9507ea
+# ╟─da9142a3-e966-4d36-b2e7-a559d233292e
+# ╟─bf8a9983-f8e2-4640-b6eb-d3e5ce9aa317
+# ╟─1ccdb93b-33a5-441e-86b1-ab2b1e085ad5
+# ╟─cc443da5-fbbe-473f-aa8a-a526cc37fce5
 # ╟─cd7142f8-443d-4b8c-971c-7a480bbde06d
 # ╟─a00ef21a-dee2-49b3-8cef-ba03313ae8c1
 # ╟─d1bc6120-b769-4394-9a46-946c00f533df
