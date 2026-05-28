@@ -43,7 +43,8 @@ end
 begin
 	using CarboKitten.Models: BS92
 	using CarboKitten: DataSets
-	using CarboKitten.Visualization: summary_plot
+	using CarboKitten.Visualization
+	using CarboKitten.Export: read_volume, read_slice
 	using Interpolations: linear_interpolation
 end
 
@@ -97,6 +98,88 @@ alcap_output = let
         lithification_time=100.0u"yr")
 
 	run_model(Model{ALCAP}, INPUT, "alcap.h5")
+end
+
+# ╔═╡ 3430e347-119a-4efb-aeb9-a197f7456030
+module CAFeedbackExample
+    using CarboKitten
+    using CarboKitten.Production
+    using CarboKitten.Models: ALCAP as M
+
+    initial_topography(x, y) =
+        min(0.0u"m", - sqrt((x - 7.5u"km")^2 + (y - 7.5u"km")^2) / 100.0 + 20.0u"m")
+
+    function main()
+        res = 100
+        steps = 5000
+        phys_scale = 15.0u"km" / res
+
+        output = Dict(
+            :topography => OutputSpec(write_interval = max(1, div(steps, 50))),
+            :profile    => OutputSpec(slice = (:, div(res, 2)+1)))
+
+        facies(feedback) = [
+            M.Facies(
+                name="euphotic",
+                activation_range=(4, 10),
+                viability_range=(1, 10),
+                production=Production.EXAMPLE[:euphotic],
+                transport_coefficient=10.0u"m/yr",
+                minimum_production=feedback ? 0.01u"m/Myr" : nothing),
+            M.Facies(
+                name="oligophotic",
+                production=BenthicProduction(
+                    maximum_growth_rate=200.0u"m/Myr",
+                    extinction_coefficient=0.1u"m^-1",
+                    saturation_intensity=60u"W/m^2"
+                ),
+                transport_coefficient=5.0u"m/yr",
+                minimum_production=feedback ? 5.0u"m/Myr" : nothing),
+            M.Facies(
+                name="pelagic",
+                active=false,
+                production=PelagicProduction(
+                    maximum_growth_rate=1.0u"1/Myr",
+                    extinction_coefficient=0.1u"m^-1",
+                    saturation_intensity=60u"W/m^2"
+                ),
+                transport_coefficient=20.0u"m/yr",
+                # minimum_production=10.0u"m/Myr"
+            )
+        ]
+
+        box = CarboKitten.Box{Periodic{2}}(grid_size=(res, res), phys_scale=phys_scale)
+
+        time_param = TimeProperties(Δt=1.0u"Myr"/steps, steps=steps)
+
+        sea_level(t) =
+            10.0u"m" * sin(2π * t / 123456.0u"yr") +
+             5.0u"m" * sin(2π * t /  80456.0u"yr")
+
+        input(feedback) = M.Input(
+            time = time_param,
+            box = box,
+            facies = facies(feedback),
+            output = output,
+
+            sea_level = sea_level,
+            initial_topography = initial_topography,
+            ca_interval = 10,
+
+            insolation = 400.0u"W/m^2",
+            subsidence_rate = 30.0u"m/Myr",
+            disintegration_rate = 20.0u"m/Myr",
+            lithification_time = 100.0u"yr",
+
+            sediment_buffer_size=50,
+            depositional_resolution=0.5u"m",
+
+            # diagnostics=true
+        )
+
+        run_model(Model{M}, input(false), "ca-wo-feedback.h5")
+        run_model(Model{M}, input(true), "ca-feedback.h5")
+    end
 end
 
 # ╔═╡ eba9dfe7-1ba9-4937-b4c4-439fb521ff15
@@ -330,6 +413,48 @@ md"""
 # ╔═╡ 99476a07-99e2-4d5d-84d9-313c4d52bc16
 summary_plot(alcap_output)
 
+# ╔═╡ e67cd7cf-2c25-41d6-bc2b-7ffa9162e456
+md"""
+## CA Feedback
+
+- Kill factories that don't produce enough.
+"""
+
+# ╔═╡ f36c4f74-6177-4a63-87e2-910ef94f16fc
+begin
+	GLMakie.activate!()
+	fig = Figure(size=(1000, 800))
+	
+	header, topography = read_volume("ca-wo-feedback.h5", :topography)
+	_, profile = read_slice("ca-wo-feedback.h5", :profile)
+	
+	ax1 = Axis(fig[1, 1:2])
+	sediment_profile!(ax1, header, profile)
+	ax1.title = "without feedback"
+	
+	ax1_wh1 = Axis(fig[3, 1])
+	ax1_wh2 = Axis(fig[3, 2])
+	sa, ft = wheeler_diagram!(ax1_wh1, ax1_wh2, header, profile)
+	Colorbar(fig[2, 1], sa; vertical=false, label="sediment accumulation [m/Myr]")
+	Colorbar(fig[2, 2], ft; vertical=false, ticks=1:3, label="dominant facies")
+	
+	header, topography = read_volume("ca-feedback.h5", :topography)
+	_, profile = read_slice("ca-feedback.h5", :profile)
+	
+	ax2 = Axis(fig[1, 3:4])
+	sediment_profile!(ax2, header, profile)
+	ax2.title = "with feedback"
+	
+	ax2_wh1 = Axis(fig[3, 3])
+	ax2_wh2 = Axis(fig[3, 4])
+	sa, ft = wheeler_diagram!(ax2_wh1, ax2_wh2, header, profile)
+	
+	Colorbar(fig[2, 3], sa; vertical=false, label="sediment accumulation [m/Myr]")
+	Colorbar(fig[2, 4], ft; vertical=false, ticks=1:3, label="dominant facies")
+	
+	fig
+end
+
 # ╔═╡ cd7142f8-443d-4b8c-971c-7a480bbde06d
 md"""
 # Denudation
@@ -397,6 +522,31 @@ In the markdown:
 md"""
 - [Docs on writing slides in Pluto](https://www.andreaskroepelin.de/blog/plutoslides/)
 """
+
+# ╔═╡ 6ee4b02a-2d84-465c-970b-4fc8c44c33fd
+# ╠═╡ disabled = true
+#=╠═╡
+begin
+	@kwdef struct TwoColumn{L, R}
+	    left::L
+	    right::R
+		fraction::Int=50
+	end
+	
+	function Base.show(io, mime::MIME"text/html", tc::TwoColumn)
+	    write(io, """<div style="display: flex;"><div style="flex: $(tc.fraction)%; margin-right: 10pt;">""")
+	    show(io, mime, tc.left)
+	    write(io, """</div><div style="flex: $(100 - tc.fraction)%;">""")
+	    show(io, mime, tc.right)
+	    write(io, """</div></div>""")
+	end
+end
+  ╠═╡ =#
+
+# ╔═╡ b47fb5cf-1a5d-4e78-821e-c247794ba65b
+function TwoColumn(left, right, frac)
+	PlutoUI.ExperimentalLayout.grid([left right])
+end
 
 # ╔═╡ 02c49ad8-8a82-456a-9374-d21042bb1bc1
 TwoColumn(md"""
@@ -557,30 +707,8 @@ let
 	fig
 end
 
-# ╔═╡ 6ee4b02a-2d84-465c-970b-4fc8c44c33fd
-# ╠═╡ disabled = true
-#=╠═╡
-begin
-	@kwdef struct TwoColumn{L, R}
-	    left::L
-	    right::R
-		fraction::Int=50
-	end
-	
-	function Base.show(io, mime::MIME"text/html", tc::TwoColumn)
-	    write(io, """<div style="display: flex;"><div style="flex: $(tc.fraction)%; margin-right: 10pt;">""")
-	    show(io, mime, tc.left)
-	    write(io, """</div><div style="flex: $(100 - tc.fraction)%;">""")
-	    show(io, mime, tc.right)
-	    write(io, """</div></div>""")
-	end
-end
-  ╠═╡ =#
-
-# ╔═╡ b47fb5cf-1a5d-4e78-821e-c247794ba65b
-function TwoColumn(left, right, frac)
-	PlutoUI.ExperimentalLayout.grid([left right])
-end
+# ╔═╡ 2a82d293-4313-4591-b7f3-17599391ebd2
+CAFeedbackExample.main()
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -2638,12 +2766,14 @@ version = "1.13.0+0"
 # ╟─a4edb5e9-995c-42eb-89f8-d7f85dfb8dc1
 # ╟─e0e0bc64-c691-471e-8594-ccdf352887f4
 # ╟─f9d9216c-53ab-4878-8701-8877f2ee3dcb
-# ╠═dcabbeb1-4384-4841-b26c-213887feba61
+# ╟─dcabbeb1-4384-4841-b26c-213887feba61
 # ╟─86219909-5970-47fd-aad6-0d2698d5cdd3
 # ╟─042b5bf9-5c77-436a-be74-d3949b2f84f2
 # ╟─8916e66a-2f60-479d-bce9-f4f505e6ef31
 # ╟─a0066da2-bf7a-410e-8684-3899609b5e01
 # ╠═99476a07-99e2-4d5d-84d9-313c4d52bc16
+# ╟─e67cd7cf-2c25-41d6-bc2b-7ffa9162e456
+# ╟─f36c4f74-6177-4a63-87e2-910ef94f16fc
 # ╠═cd7142f8-443d-4b8c-971c-7a480bbde06d
 # ╟─a00ef21a-dee2-49b3-8cef-ba03313ae8c1
 # ╟─d1bc6120-b769-4394-9a46-946c00f533df
@@ -2661,5 +2791,7 @@ version = "1.13.0+0"
 # ╠═d775081d-733c-4d0a-ab33-f721d8074604
 # ╠═3f86f55e-e56b-41b1-bff5-f05eeda0fbdf
 # ╠═9cf75959-90ec-4cd2-8c00-a95a2ffb1340
+# ╠═3430e347-119a-4efb-aeb9-a197f7456030
+# ╠═2a82d293-4313-4591-b7f3-17599391ebd2
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
