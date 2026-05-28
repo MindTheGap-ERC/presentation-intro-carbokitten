@@ -43,6 +43,7 @@ begin
 	using CarboKitten.Models: BS92
 	using CarboKitten: DataSets
 	using CarboKitten.Visualization: summary_plot
+	using Interpolations: linear_interpolation
 end
 
 # ╔═╡ c510433d-23d7-45f4-8df8-85f896f15173
@@ -248,15 +249,15 @@ md"""
 # ╔═╡ 8bae0730-f7bb-4b4e-9aef-98a749f5ff6a
 md"""
 ## Incompleteness may substantially bias our interpretations 
-**If we ignore the fact that the stratigraphy is incomplete, our interpretations based on the information from incomplete stratigraphy might deliver a faulty result, but fortunately the forward model may help us spot the bias out**
+If we ignore the fact that the stratigraphy is incomplete, our interpretations based on the information from incomplete stratigraphy might deliver a faulty result, but fortunately the forward model may help us spot the bias out
 
-![Faulty interpretation on trait evolution](fig/PartTraitEvolution.jpg)
+$(LocalResource("./fig/PartTraitEvolution.jpg"))
 
-- This figure shows that the incomplete stratigraphy (from a forward model) would bias our interpretation of mode of evolution towards a punctuated mode. 
+Incomplete stratigraphy will bias our interpretation of mode of evolution towards sudden shifts. 
 
 *Source: Hohmann et al., 2024*
-"""
 
+"""
 
 # ╔═╡ d12d3e20-4fc3-4240-8f3b-95c520117740
 md"""## CarboKitten's architecture
@@ -528,7 +529,7 @@ Not open source:
 - CARB3D+
 - DionisosFlow
 
-Our starting point: CarboCAT (Burgess 2013) - more OS than others but still in Matlab and no version control, slow
+Our starting point: **CarboCAT** (Burgess 2013) - more OS than others but still in Matlab and no version control, slow
 """,
 md"""
 $(LocalResource("./fig/oil.jpg"))
@@ -579,8 +580,8 @@ bs92_output = let
 	    box = CarboKitten.Box{Coast}(grid_size=(100, 1), phys_scale=600.0u"m"),
 	    time = TimeProperties(
 	      Δt = 10.0u"yr",
-	      steps = 8000,
-	      write_interval = 100),
+	      steps = 8000),
+	    output = Dict(:full => OutputSpec(write_interval=100)),
 	    sea_level = let sc = sealevel_curve()
 	      t -> -sc(t)
 	    end,
@@ -588,10 +589,11 @@ bs92_output = let
 	    subsidence_rate = 0.0u"m/yr",
 	    insolation = 400.0u"W/m^2",
 	    facies = [BS92.Facies(
-	      maximum_growth_rate = 0.005u"m/yr",
-	      saturation_intensity = 50.0u"W/m^2",
-	      extinction_coefficient = 0.05u"m^-1"
-	    )])
+	      production = BenthicProduction(
+	        maximum_growth_rate = 0.005u"m/yr",
+	        saturation_intensity = 50.0u"W/m^2",
+	        extinction_coefficient = 0.05u"m^-1"
+	      ))])
 	
 	run_model(Model{BS92}, INPUT, "bs92.h5")
 end
@@ -625,9 +627,7 @@ CarboKitten = "690c6d5c-626a-429f-a06b-981a1dae1c19"
 GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
 GraphvizDotLang = "6039e64d-d8b8-4c93-8e43-7efd2f757352"
 Interpolations = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
-Loess = "4345ca2d-374a-55d4-8d30-97f9976e7612"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
-SmoothingSplines = "102930c3-cf33-599f-b3b1-9a29a5acab30"
 Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 
 [compat]
@@ -635,9 +635,7 @@ CarboKitten = "~0.6.0"
 GLMakie = "~0.13.9"
 GraphvizDotLang = "~0.2.1"
 Interpolations = "~0.16.2"
-Loess = "~0.6.5"
 PlutoUI = "~0.7.60"
-SmoothingSplines = "~0.3.2"
 Unitful = "~1.28.0"
 """
 
@@ -647,7 +645,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.12.5"
 manifest_format = "2.0"
-project_hash = "0b332a353444dd00f6e54e73ad0d4310bdde8bb7"
+project_hash = "aba0e37bd79b47be0e2a440fd697e1cae0bdf5b1"
 
 [[deps.AbstractFFTs]]
 deps = ["LinearAlgebra"]
@@ -958,17 +956,6 @@ deps = ["Mmap"]
 git-tree-sha1 = "9e2f36d3c96a820c678f2f1f1782582fcf685bae"
 uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 version = "1.9.1"
-
-[[deps.Distances]]
-deps = ["LinearAlgebra", "Statistics", "StatsAPI"]
-git-tree-sha1 = "c7e3a542b999843086e2f29dac96a618c105be1d"
-uuid = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"
-version = "0.10.12"
-weakdeps = ["ChainRulesCore", "SparseArrays"]
-
-    [deps.Distances.extensions]
-    DistancesChainRulesCoreExt = "ChainRulesCore"
-    DistancesSparseArraysExt = "SparseArrays"
 
 [[deps.Distributed]]
 deps = ["Random", "Serialization", "Sockets"]
@@ -1584,12 +1571,6 @@ deps = ["Libdl", "OpenBLAS_jll", "libblastrampoline_jll"]
 uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 version = "1.12.0"
 
-[[deps.Loess]]
-deps = ["Distances", "LinearAlgebra", "Statistics", "StatsAPI", "StatsFuns"]
-git-tree-sha1 = "b1ad83b367b915e2dc485dee3d62a6a6317d7ad4"
-uuid = "4345ca2d-374a-55d4-8d30-97f9976e7612"
-version = "0.6.5"
-
 [[deps.LogExpFunctions]]
 deps = ["DocStringExtensions", "IrrationalConstants", "LinearAlgebra"]
 git-tree-sha1 = "13ca9e2586b89836fd20cccf56e57e2b9ae7f38f"
@@ -2091,12 +2072,6 @@ deps = ["Dates", "FileIO", "ImageCore", "IndirectArrays", "OffsetArrays", "REPL"
 git-tree-sha1 = "0494aed9501e7fb65daba895fb7fd57cc38bc743"
 uuid = "45858cf5-a6b0-47a3-bbea-62219f50df47"
 version = "0.1.5"
-
-[[deps.SmoothingSplines]]
-deps = ["LinearAlgebra", "Random", "Reexport", "StatsBase"]
-git-tree-sha1 = "3a68e878003f7d6ea0be9e3bafcabfb79f5a70ee"
-uuid = "102930c3-cf33-599f-b3b1-9a29a5acab30"
-version = "0.3.2"
 
 [[deps.Sockets]]
 uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
@@ -2664,14 +2639,14 @@ version = "1.13.0+0"
 # ╟─1b0a59fb-85cb-4091-8893-4088aafb9761
 # ╟─fe8d2c6e-a124-4561-8864-e40cf00ca177
 # ╟─d3f8125a-7b59-4ac4-94f1-61fce8903b4b
-# ╠═741bbf64-5b80-4e5c-b53e-98d756d68ef6
+# ╟─741bbf64-5b80-4e5c-b53e-98d756d68ef6
 # ╠═7d7033f1-0443-410d-8e73-62eabb53ea9c
 # ╠═6b5d1935-0773-4933-ae56-b5b88b81f87e
 # ╠═3dd47c47-2e3a-4970-982d-b1c2eb9cfdd7
 # ╠═e9754cdc-1180-4bc5-b87c-a11d659d33aa
-# ╠═3f16dfb2-bc9e-4f69-8405-215f3099498f
-# ╠═8bae0730-f7bb-4b4e-9aef-98a749f5ff6a
-# ╠═d12d3e20-4fc3-4240-8f3b-95c520117740
+# ╟─3f16dfb2-bc9e-4f69-8405-215f3099498f
+# ╟─8bae0730-f7bb-4b4e-9aef-98a749f5ff6a
+# ╟─d12d3e20-4fc3-4240-8f3b-95c520117740
 # ╟─bb797b6f-47c2-4ebc-a096-ed2e8cd0b9ff
 # ╟─6f6fa95d-b163-4cc6-ab3c-9bc86083d54d
 # ╟─afa830cf-f4ce-442d-9649-3e912893052c
@@ -2706,10 +2681,7 @@ version = "1.13.0+0"
 # ╠═aa20619b-fe16-4b01-9532-8f6c6277d399
 # ╠═c510433d-23d7-45f4-8df8-85f896f15173
 # ╠═d775081d-733c-4d0a-ab33-f721d8074604
-# ╠═64179a23-b142-46cf-8630-98d80a532250
 # ╠═3f86f55e-e56b-41b1-bff5-f05eeda0fbdf
 # ╠═9cf75959-90ec-4cd2-8c00-a95a2ffb1340
-# ╠═1de3178f-bf54-4d04-ba87-b712fcb994aa
-# ╠═a1982b18-81d1-47bf-8a70-4f76c3c413e4
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
