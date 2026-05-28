@@ -201,45 +201,6 @@ $(LocalResource("./fig/SealevelBahamas.jpg"))
 """
 
 
-# ╔═╡ 7d7033f1-0443-410d-8e73-62eabb53ea9c
-# ╠═╡ disabled = true
-#=╠═╡
-md"""
-## Think about this...
-### You are only able to see, what stratigraphy allows you to see.
-$(LocalResource("fig/lightcolor.png"))
-**Stratigraphy is like the colored light here.**
-"""
-  ╠═╡ =#
-
-# ╔═╡ 6b5d1935-0773-4933-ae56-b5b88b81f87e
-# ╠═╡ disabled = true
-#=╠═╡
-md"""
-## So...
-### The key is to know what color is the light!
-**If we know the behaviour of stratigraphy, are we able to reconstruct the original information?**
-$(LocalResource("fig/WhyFM.jpg"))
-**How? Use forward modeling to understand the stratigraphy.**
-"""
-  ╠═╡ =#
-
-# ╔═╡ 3dd47c47-2e3a-4970-982d-b1c2eb9cfdd7
-# ╠═╡ disabled = true
-#=╠═╡
-md"""
-## Question 2
-**If the stratigraphy is incomplete, how much astronomical signals would you expect to be preserved?**
-
-Please bear in mind, and we may study this in practice later!
-"""
-  ╠═╡ =#
-
-# ╔═╡ e9754cdc-1180-4bc5-b87c-a11d659d33aa
-md"""
-# Towards a FOSS carbonate stratigraphic forward model 
-"""
-
 # ╔═╡ 8bae0730-f7bb-4b4e-9aef-98a749f5ff6a
 md"""
 ## Incompleteness may substantially bias our interpretations 
@@ -253,6 +214,11 @@ Incomplete stratigraphy will bias our interpretation of mode of evolution toward
 
 """
 
+# ╔═╡ e9754cdc-1180-4bc5-b87c-a11d659d33aa
+md"""
+# Towards a FOSS carbonate stratigraphic forward model 
+"""
+
 # ╔═╡ 40a80600-17de-4012-a8bf-4635485144ef
 md"# CarboKitten.jl
 
@@ -261,6 +227,7 @@ Our flagship features:
 - Carbonate production (Bosscher & Schlager 1992)
 - Ecological interactions leading to spatial heterogeneity (Burgess 2013)
 - Bespoke sediment transport model (Hidding et al. 2025)
+- Explicit control over physical units (`Unitful`)
 "
 
 # ╔═╡ d12d3e20-4fc3-4240-8f3b-95c520117740
@@ -423,6 +390,21 @@ md"""
 
 $(LocalResource("fig/variable-insolation.png"))
 """
+
+# ╔═╡ cd7142f8-443d-4b8c-971c-7a480bbde06d
+md"""
+# Denudation
+When carbonates are subaerially exposed, they undergo denudation (dissolution + erosion).
+
+A handful of studies incorporate up-to-date knowledge from landscape evolution into carbonate platform denudation.
+
+We can use three ways to simulated denudation:
+- Chemical dissolution
+- Physical Erosion
+- Empirical rates derived from regression over Cl isotopes
+
+"""
+
 # ╔═╡ e67cd7cf-2c25-41d6-bc2b-7ffa9162e456
 md"""
 ## CA Feedback
@@ -464,20 +446,6 @@ begin
 	
 	fig
 end
-
-# ╔═╡ cd7142f8-443d-4b8c-971c-7a480bbde06d
-md"""
-# Denudation
-When carbonates are subaerially exposed, they undergo denudation (dissolution + erosion).
-
-A handful of studies incorporate up-to-date knowledge from landscape evolution into carbonate platform denudation.
-
-We can use three ways to simulated denudation:
-- Chemical dissolution
-- Physical Erosion
-- Empirical rates derived from regression over Cl isotopes
-
-"""
 
 # ╔═╡ a00ef21a-dee2-49b3-8cef-ba03313ae8c1
 md"""
@@ -541,33 +509,6 @@ Here we use a proxy called *spatial entropy* (SE) to measure the 2D heterogeneit
 $$SE = DisCon / TotCon$$
 
 $(LocalResource("fig/spatial_entropy.png"))
-"""
-
-# ╔═╡ 289c9bc6-8627-46cd-b07d-820a9f86855d
-md"""
-# CarboKitten 1.0
-
-- We need your input!
-"""
-
-# ╔═╡ 1f0f95b1-9a82-47f8-ac48-2d3c56471daa
-md"""
-# Practical
-"""
-
-# ╔═╡ a382876a-f900-4f1b-955b-a4a3aca79be5
-md"""
-## Instructions
-The cells below are not part of the presentation. Add things here that are need to run the notebook.
-
-In the markdown:
-- Use level-1 headers (single `#`) for a new chapter
-- Use level-2 headers (double `##`) for a new slide
-"""
-
-# ╔═╡ 85992544-7b70-4cc4-9d98-621ac54370a6
-md"""
-- [Docs on writing slides in Pluto](https://www.andreaskroepelin.de/blog/plutoslides/)
 """
 
 # ╔═╡ 6ee4b02a-2d84-465c-970b-4fc8c44c33fd
@@ -720,8 +661,16 @@ Typical input data:
 """,
 md"""
 Input formats:
-- inline (anonymous) functions
+		  
 - importing CSV files
+- functions (e.g. interpolation, stochastic process)
+- inline (anonymous) functions
+
+```
+const INPUT = Input(
+sea_level = t -> 10.0u"m" * sin(2pi / 100u"kyr")
+)
+```
 """,50)
 
 
@@ -764,25 +713,6 @@ end
 # ╔═╡ afa830cf-f4ce-442d-9649-3e912893052c
 summary_plot(bs92_output)
 
-# ╔═╡ 3f86f55e-e56b-41b1-bff5-f05eeda0fbdf
-model = let
-	df = miller_2020()
-	ldf = df[df.refkey .== "846 Lisiecki", :]
-	loess(ldf.time |> in_units_of(u"Myr"), ldf.sealevel |> in_units_of(u"m"), span=0.005)
-end
-
-# ╔═╡ 9cf75959-90ec-4cd2-8c00-a95a2ffb1340
-let
-	t = -0.9:0.001:-0.2
-	s = predict(model, t)
-	fig = Figure()
-	ax = Axis(fig[1,1])
-	band!(ax, t, -20.0, max.(s, -20.0), color=:lemonchiffon)
-	lines!(ax, t, s)
-	hlines!(ax, -20.0, color=:black)
-	fig
-end
-
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
@@ -806,7 +736,7 @@ Unitful = "~1.28.0"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.12.6"
+julia_version = "1.12.5"
 manifest_format = "2.0"
 project_hash = "cc4d31c96150bb1f99f0eea26a0bef70bb9640ca"
 
@@ -2828,12 +2758,9 @@ version = "1.13.0+0"
 # ╟─fe8d2c6e-a124-4561-8864-e40cf00ca177
 # ╟─d3f8125a-7b59-4ac4-94f1-61fce8903b4b
 # ╟─741bbf64-5b80-4e5c-b53e-98d756d68ef6
-# ╟─7d7033f1-0443-410d-8e73-62eabb53ea9c
-# ╟─6b5d1935-0773-4933-ae56-b5b88b81f87e
-# ╟─3dd47c47-2e3a-4970-982d-b1c2eb9cfdd7
+# ╟─8bae0730-f7bb-4b4e-9aef-98a749f5ff6a
 # ╟─e9754cdc-1180-4bc5-b87c-a11d659d33aa
 # ╟─3f16dfb2-bc9e-4f69-8405-215f3099498f
-# ╟─8bae0730-f7bb-4b4e-9aef-98a749f5ff6a
 # ╟─40a80600-17de-4012-a8bf-4635485144ef
 # ╟─d12d3e20-4fc3-4240-8f3b-95c520117740
 # ╟─bb797b6f-47c2-4ebc-a096-ed2e8cd0b9ff
@@ -2861,10 +2788,9 @@ version = "1.13.0+0"
 # ╟─e267e3f6-c0b9-486f-8c0c-c2ce202e2b29
 # ╟─ded8a137-8111-4912-841b-30eaff4c7fc0
 # ╟─126ff04f-5956-4d51-aa31-96bebd656032
-# ╟─cd7142f8-443d-4b8c-971c-7a480bbde06d
+# ╠═cd7142f8-443d-4b8c-971c-7a480bbde06d
 # ╟─e67cd7cf-2c25-41d6-bc2b-7ffa9162e456
 # ╟─f36c4f74-6177-4a63-87e2-910ef94f16fc
-# ╠═cd7142f8-443d-4b8c-971c-7a480bbde06d
 # ╟─a00ef21a-dee2-49b3-8cef-ba03313ae8c1
 # ╟─d1bc6120-b769-4394-9a46-946c00f533df
 # ╟─e6234d9e-e212-4c3e-b3a0-58a918bd1ccf
@@ -2872,17 +2798,11 @@ version = "1.13.0+0"
 # ╠═d4a4270c-5323-40e0-83c8-25f1fca65b00
 # ╟─b6b58248-d1ef-49ae-96b3-2f36567a9ca2
 # ╟─5d83cb24-86b5-44dc-b4e2-81d12666cabf
-# ╟─289c9bc6-8627-46cd-b07d-820a9f86855d
-# ╟─1f0f95b1-9a82-47f8-ac48-2d3c56471daa
-# ╟─a382876a-f900-4f1b-955b-a4a3aca79be5
-# ╟─85992544-7b70-4cc4-9d98-621ac54370a6
-# ╠═0dbd9cce-a006-11ef-365b-d388b63f5339
-# ╠═771e87fa-4ee7-4c66-b71f-7fbc99505f7c
-# ╠═6ee4b02a-2d84-465c-970b-4fc8c44c33fd
-# ╠═aa20619b-fe16-4b01-9532-8f6c6277d399
-# ╠═c510433d-23d7-45f4-8df8-85f896f15173
-# ╠═d775081d-733c-4d0a-ab33-f721d8074604
-# ╠═3f86f55e-e56b-41b1-bff5-f05eeda0fbdf
-# ╠═9cf75959-90ec-4cd2-8c00-a95a2ffb1340
+# ╟─0dbd9cce-a006-11ef-365b-d388b63f5339
+# ╟─771e87fa-4ee7-4c66-b71f-7fbc99505f7c
+# ╟─6ee4b02a-2d84-465c-970b-4fc8c44c33fd
+# ╟─aa20619b-fe16-4b01-9532-8f6c6277d399
+# ╟─c510433d-23d7-45f4-8df8-85f896f15173
+# ╟─d775081d-733c-4d0a-ab33-f721d8074604
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
