@@ -413,6 +413,13 @@ md"""
 # ╔═╡ 99476a07-99e2-4d5d-84d9-313c4d52bc16
 summary_plot(alcap_output)
 
+# ╔═╡ 154c8beb-1554-42ff-b863-741637a4d35c
+md"""
+## Cementation and disintegration
+
+$(LocalResource("fig/canvas.png"))
+"""
+
 # ╔═╡ e67cd7cf-2c25-41d6-bc2b-7ffa9162e456
 md"""
 ## CA Feedback
@@ -735,7 +742,7 @@ Unitful = "~1.28.0"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.12.6"
+julia_version = "1.12.5"
 manifest_format = "2.0"
 project_hash = "b4f755476d374819fdae47cab927162d1af4053b"
 
@@ -2769,9 +2776,10 @@ version = "1.13.0+0"
 # ╟─dcabbeb1-4384-4841-b26c-213887feba61
 # ╟─86219909-5970-47fd-aad6-0d2698d5cdd3
 # ╟─042b5bf9-5c77-436a-be74-d3949b2f84f2
-# ╟─8916e66a-2f60-479d-bce9-f4f505e6ef31
+# ╠═8916e66a-2f60-479d-bce9-f4f505e6ef31
 # ╟─a0066da2-bf7a-410e-8684-3899609b5e01
 # ╠═99476a07-99e2-4d5d-84d9-313c4d52bc16
+# ╟─154c8beb-1554-42ff-b863-741637a4d35c
 # ╟─e67cd7cf-2c25-41d6-bc2b-7ffa9162e456
 # ╟─f36c4f74-6177-4a63-87e2-910ef94f16fc
 # ╠═cd7142f8-443d-4b8c-971c-7a480bbde06d
