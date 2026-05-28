@@ -373,7 +373,11 @@ A handful of studies incorporate up-to-date knowledge from landscape evolution i
 
 We can use three ways to simulated denudation:
 - Dissolution
+We can use three ways to simulated denudation:
+- Dissolution
 - Physical Erosion
+- Emperical regression
+
 - Emperical regression
 
 """
@@ -384,6 +388,7 @@ md"""
 ## Dissolution
 
 - Kinetic rate law
+- Kinetic rate law
 $$F = \alpha (c_{eq}-c(z))$$
 $$D_{\rm average} = (I\times \frac{c_{eq}}{\rho})\ (1 – (\frac{\lambda}{z_0})\ (1 – e^{(\frac{-z_0}{\lambda})}))$$
 
@@ -393,6 +398,7 @@ $(LocalResource("fig/Dis.png"))
 # ╔═╡ d1bc6120-b769-4394-9a46-946c00f533df
 md""" 
 ## Physical erosion
+- Distribute sediments to neighboring cells based on slope.
 - Distribute sediments to neighboring cells based on slope.
 $$D_{phys} = -k_v * (1 - I_f)^{1/3} |\nabla h|^{2/3}$$
 herein, D$_{phys}$ is denudation rate, k$_v$ is erodibility, I$_f$ is infiltration, and h is height.
@@ -418,12 +424,15 @@ $(LocalResource("fig/Joulters_cay.jpg"))
 md"""
 ## Habitat mapping
 We chose the images from 1945 and interprete its habitat distribution, and compare it to the 2019 satellite images.
+We chose the images from 1945 and interprete its habitat distribution, and compare it to the 2019 satellite images.
 
 $(LocalResource("fig/Joulters_habitat.png"))
 """
 
 # ╔═╡ 5d83cb24-86b5-44dc-b4e2-81d12666cabf
 md"""
+## Measuring the heterogeneity
+Here we use a proxy called 'spatial entropy (SE)' to measure the 2D heterogeneity. The defination is presented below. Where `DisCon` means: Number of dissimilar facies connections and `TotCon` means: Total connections.
 ## Measuring the heterogeneity
 Here we use a proxy called 'spatial entropy (SE)' to measure the 2D heterogeneity. The defination is presented below. Where `DisCon` means: Number of dissimilar facies connections and `TotCon` means: Total connections.
 
@@ -669,6 +678,7 @@ Unitful = "~1.28.0"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
+julia_version = "1.12.6"
 julia_version = "1.12.6"
 manifest_format = "2.0"
 project_hash = "cc4d31c96150bb1f99f0eea26a0bef70bb9640ca"
