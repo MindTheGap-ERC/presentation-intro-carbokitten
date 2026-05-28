@@ -52,19 +52,22 @@ cap_output = let
 	
 	FACIES = [
 	    CAP.Facies(
-        maximum_growth_rate = 500u"m/Myr",
-        extinction_coefficient = 0.8u"m^-1",
-        saturation_intensity = 60u"W/m^2"),
+        production = BenthicProduction(
+            maximum_growth_rate = 500u"m/Myr",
+            extinction_coefficient = 0.8u"m^-1",
+            saturation_intensity = 60u"W/m^2")),
 
 	    CAP.Facies(
-        maximum_growth_rate = 400u"m/Myr",
-        extinction_coefficient = 0.1u"m^-1",
-        saturation_intensity = 60u"W/m^2"),
+        production = BenthicProduction(
+            maximum_growth_rate = 400u"m/Myr",
+            extinction_coefficient = 0.1u"m^-1",
+            saturation_intensity = 60u"W/m^2")),
 
 	    CAP.Facies(
-        maximum_growth_rate = 100u"m/Myr",
-        extinction_coefficient = 0.005u"m^-1",
-        saturation_intensity = 60u"W/m^2")
+        production = BenthicProduction(
+            maximum_growth_rate = 100u"m/Myr",
+            extinction_coefficient = 0.005u"m^-1",
+            saturation_intensity = 60u"W/m^2"))
 	]
 
 	function sea_level(t)
@@ -294,14 +297,6 @@ let
 	heatmap!(ax, ca_state.ca)
 	fig
 end
-
-# ╔═╡ 2df751f2-0a2a-42d7-9d0f-3db4af3a8f5d
-md"""
-## CA-Driven Production
-"""
-
-# ╔═╡ f14d4f60-75c0-4c75-acb1-8de730aaf952
-summary_plot(cap_output)
 
 # ╔═╡ dcabbeb1-4384-4841-b26c-213887feba61
 md"## Active Layer Diffusion"
@@ -681,6 +676,22 @@ sea_level = t -> 10.0u"m" * sin(2pi / 100u"kyr")
 
 TwoColumn(md"""$(LocalResource("fig/Precipitation-Denudation.svg"))""",md"""$(LocalResource("fig/Slope-Denudation.svg"))""",50)
 
+
+# ╔═╡ 40dbb2f7-7242-4f76-8db2-a62cdb3a3ffc
+TwoColumn(md"""
+**Future work**
+
+- We need you!
+- File issues and use GH discussions
+- Send feedback and feature requests any other way
+- Cite Hidding et al. (2025)""",
+md"""
+**Our aspirations**
+
+- Literate programming
+- Test coverage
+- Modularity
+""",50)
 
 # ╔═╡ aa20619b-fe16-4b01-9532-8f6c6277d399
 bs92_output = let
@@ -2775,8 +2786,6 @@ version = "1.13.0+0"
 # ╟─a4edb5e9-995c-42eb-89f8-d7f85dfb8dc1
 # ╟─e0e0bc64-c691-471e-8594-ccdf352887f4
 # ╟─f9d9216c-53ab-4878-8701-8877f2ee3dcb
-# ╟─2df751f2-0a2a-42d7-9d0f-3db4af3a8f5d
-# ╠═f14d4f60-75c0-4c75-acb1-8de730aaf952
 # ╟─dcabbeb1-4384-4841-b26c-213887feba61
 # ╟─86219909-5970-47fd-aad6-0d2698d5cdd3
 # ╟─042b5bf9-5c77-436a-be74-d3949b2f84f2
@@ -2802,11 +2811,12 @@ version = "1.13.0+0"
 # ╠═d4a4270c-5323-40e0-83c8-25f1fca65b00
 # ╟─b6b58248-d1ef-49ae-96b3-2f36567a9ca2
 # ╟─5d83cb24-86b5-44dc-b4e2-81d12666cabf
+# ╟─40dbb2f7-7242-4f76-8db2-a62cdb3a3ffc
 # ╟─0dbd9cce-a006-11ef-365b-d388b63f5339
 # ╟─771e87fa-4ee7-4c66-b71f-7fbc99505f7c
 # ╟─6ee4b02a-2d84-465c-970b-4fc8c44c33fd
 # ╟─aa20619b-fe16-4b01-9532-8f6c6277d399
-# ╟─c510433d-23d7-45f4-8df8-85f896f15173
+# ╠═c510433d-23d7-45f4-8df8-85f896f15173
 # ╟─d775081d-733c-4d0a-ab33-f721d8074604
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
