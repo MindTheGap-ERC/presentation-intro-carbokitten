@@ -28,9 +28,6 @@ macro bind(def, element)
     #! format: on
 end
 
-# ╔═╡ c2a91309-290f-4a7f-874a-f570c7f0992e
-using PlutoTeachingTools
-
 # ╔═╡ 0dbd9cce-a006-11ef-365b-d388b63f5339
 begin
 	using PlutoUI
@@ -370,14 +367,15 @@ summary_plot(alcap_output)
 # ╔═╡ cd7142f8-443d-4b8c-971c-7a480bbde06d
 md"""
 # Denudation
-When carbonates are subaerially exposed, they undergo denudation (dissolution + erosion).
+When the carbonates are subaerially exposed, they undergo denudation (dissolution + erosion).
 
 A handful of studies incorporate up-to-date knowledge from landscape evolution into carbonate platform denudation.
 
-We use three approaches to simulate denudation:
-- Chemical dissolution
+We can use three ways to simulated denudation:
+- Dissolution
 - Physical Erosion
-- Empirical rates derived from regression over Cl isotopes
+- Emperical regression
+
 """
 
 # ╔═╡ a00ef21a-dee2-49b3-8cef-ba03313ae8c1
@@ -385,8 +383,7 @@ md"""
 
 ## Dissolution
 
-Kinetic rate law
-
+- Kinetic rate law
 $$F = \alpha (c_{eq}-c(z))$$
 $$D_{\rm average} = (I\times \frac{c_{eq}}{\rho})\ (1 – (\frac{\lambda}{z_0})\ (1 – e^{(\frac{-z_0}{\lambda})}))$$
 
@@ -396,9 +393,9 @@ $(LocalResource("fig/Dis.png"))
 # ╔═╡ d1bc6120-b769-4394-9a46-946c00f533df
 md""" 
 ## Physical erosion
-Distribute sediments to neighboring cells based on slope.
-
+- Distribute sediments to neighboring cells based on slope.
 $$D_{phys} = -k_v * (1 - I_f)^{1/3} |\nabla h|^{2/3}$$
+herein, D$_{phys}$ is denudation rate, k$_v$ is erodibility, I$_f$ is infiltration, and h is height.
 $(LocalResource("fig/Ero.png"))
 *Source: van Der Wiel et al., 2007*
 """
@@ -406,35 +403,31 @@ $(LocalResource("fig/Ero.png"))
 # ╔═╡ e6234d9e-e212-4c3e-b3a0-58a918bd1ccf
 md"""
 ## Regression from Cl isotope observations
-$$D = P × S$$
+- $$D_{emp} = P × S$$
+Herein, D$_{emp}$ is denudation rate, P is precipitation and S is slope.  
 """
 
 # ╔═╡ d4a4270c-5323-40e0-83c8-25f1fca65b00
 md"""
-# Modern cases study from the Bahamas
-Modelling of facies heterogeneity is achieved using Cellular Automata and indrectly accounts for external forcing. To test whether CarboKitten captures the same degree of heterogeneity, we used modern observed data.
-
+# Modern case study from the Bahamas
+The modelling of facies heterogeneity is primarily based on Cellular Automata principle, and indrectly influenced by external forcings. To test whether the model could capture the same degree of heterogeneity or not, we will use modern observed data to validate our model.
 $(LocalResource("fig/Joulters_cay.jpg"))
 """
 
 # ╔═╡ b6b58248-d1ef-49ae-96b3-2f36567a9ca2
 md"""
 ## Habitat mapping
-We chose the images from 1945, interpreted the habitat distribution, and compared it to the same habitats in 2019 satellite images.
+We chose the images from 1945 and interprete its habitat distribution, and compare it to the 2019 satellite images.
 
 $(LocalResource("fig/Joulters_habitat.png"))
 """
 
 # ╔═╡ 5d83cb24-86b5-44dc-b4e2-81d12666cabf
 md"""
-## Measuring spatial heterogeneity
-Here we use a proxy called *spatial entropy* (SE) to measure the 2D heterogeneity. The definition is presented below. 
+## Measuring the heterogeneity
+Here we use a proxy called 'spatial entropy (SE)' to measure the 2D heterogeneity. The defination is presented below. Where `DisCon` means: Number of dissimilar facies connections and `TotCon` means: Total connections.
 
-`DisCon` - Number of dissimilar facies connections 
-
-`TotCon` - Total number of connections
-
-**Manuscript submitted - ongoing work**
+**This work is on-going...**
 
 
 $$SE = DisCon / TotCon$$
@@ -660,7 +653,6 @@ CarboKitten = "690c6d5c-626a-429f-a06b-981a1dae1c19"
 GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
 GraphvizDotLang = "6039e64d-d8b8-4c93-8e43-7efd2f757352"
 Interpolations = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
-PlutoTeachingTools = "661c6b06-c737-4d37-b85c-46df65de6f69"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 
@@ -669,7 +661,6 @@ CarboKitten = "~0.6.0"
 GLMakie = "~0.13.10"
 GraphvizDotLang = "~0.2.1"
 Interpolations = "~0.16.2"
-PlutoTeachingTools = "~0.4.7"
 PlutoUI = "~0.7.80"
 Unitful = "~1.28.0"
 """
@@ -678,9 +669,9 @@ Unitful = "~1.28.0"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.12.5"
+julia_version = "1.12.6"
 manifest_format = "2.0"
-project_hash = "3d65d13e00137bde0a4daec24bc204eadc105db5"
+project_hash = "cc4d31c96150bb1f99f0eea26a0bef70bb9640ca"
 
 [[deps.AbstractFFTs]]
 deps = ["LinearAlgebra"]
@@ -1211,12 +1202,6 @@ git-tree-sha1 = "45288942190db7c5f760f59c04495064eedf9340"
 uuid = "b0724c58-0f36-5564-988d-3bb0596ebc4a"
 version = "0.22.4+0"
 
-[[deps.Ghostscript_jll]]
-deps = ["Artifacts", "JLLWrappers", "JpegTurbo_jll", "Libdl", "Zlib_jll"]
-git-tree-sha1 = "38044a04637976140074d0b0621c1edf0eb531fd"
-uuid = "61579ee1-b43e-5ca0-a5da-69d92c66a64b"
-version = "9.55.1+0"
-
 [[deps.Giflib_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
 git-tree-sha1 = "6570366d757b50fabae9f4315ad74d2e40c0560a"
@@ -1535,24 +1520,6 @@ version = "18.1.8+0"
 git-tree-sha1 = "dda21b8cbd6a6c40d9d02a73230f9d70fed6918c"
 uuid = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
 version = "1.4.0"
-
-[[deps.Latexify]]
-deps = ["Format", "Ghostscript_jll", "InteractiveUtils", "LaTeXStrings", "MacroTools", "Markdown", "OrderedCollections", "Requires"]
-git-tree-sha1 = "44f93c47f9cd6c7e431f2f2091fcba8f01cd7e8f"
-uuid = "23fbe1c1-3f47-55db-b15f-69d7ec21a316"
-version = "0.16.10"
-
-    [deps.Latexify.extensions]
-    DataFramesExt = "DataFrames"
-    SparseArraysExt = "SparseArrays"
-    SymEngineExt = "SymEngine"
-    TectonicExt = "tectonic_jll"
-
-    [deps.Latexify.weakdeps]
-    DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
-    SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
-    SymEngine = "123dc426-2d89-5057-bbad-38513e3affd8"
-    tectonic_jll = "d7dd28d6-a5e6-559c-9131-7eb760cdacc5"
 
 [[deps.LazyArtifacts]]
 deps = ["Artifacts", "Pkg"]
@@ -1934,12 +1901,6 @@ deps = ["ColorSchemes", "Colors", "Dates", "PrecompileTools", "Printf", "Random"
 git-tree-sha1 = "26ca162858917496748aad52bb5d3be4d26a228a"
 uuid = "995b91a9-d308-5afd-9ec6-746e21dbc043"
 version = "1.4.4"
-
-[[deps.PlutoTeachingTools]]
-deps = ["Downloads", "HypertextLiteral", "Latexify", "Markdown", "PlutoUI"]
-git-tree-sha1 = "90b41ced6bacd8c01bd05da8aed35c5458891749"
-uuid = "661c6b06-c737-4d37-b85c-46df65de6f69"
-version = "0.4.7"
 
 [[deps.PlutoUI]]
 deps = ["AbstractPlutoDingetjes", "Base64", "ColorTypes", "Dates", "Downloads", "FixedPointNumbers", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "Logging", "MIMEs", "Markdown", "Random", "Reexport", "URIs", "UUIDs"]
@@ -2722,20 +2683,19 @@ version = "1.13.0+0"
 # ╔═╡ Cell order:
 # ╟─eba9dfe7-1ba9-4937-b4c4-439fb521ff15
 # ╟─c25f2a9f-f7c1-41f6-b4ac-03b19377a6e6
-# ╠═c2a91309-290f-4a7f-874a-f570c7f0992e
 # ╟─02c49ad8-8a82-456a-9374-d21042bb1bc1
 # ╟─f7b4113e-16fe-4833-95f7-e38fccaa38b7
 # ╟─726a44e0-819e-44d5-ac52-b03ca052e3e8
 # ╟─e32ba22a-034f-430f-83ce-1774a26b7429
 # ╟─f9812c71-da1f-408f-800b-f42bbb9151b3
-# ╠═fe8d2c6e-a124-4561-8864-e40cf00ca177
+# ╟─fe8d2c6e-a124-4561-8864-e40cf00ca177
 # ╟─d3f8125a-7b59-4ac4-94f1-61fce8903b4b
 # ╟─741bbf64-5b80-4e5c-b53e-98d756d68ef6
 # ╟─7d7033f1-0443-410d-8e73-62eabb53ea9c
 # ╟─6b5d1935-0773-4933-ae56-b5b88b81f87e
 # ╟─3dd47c47-2e3a-4970-982d-b1c2eb9cfdd7
 # ╟─e9754cdc-1180-4bc5-b87c-a11d659d33aa
-# ╠═3f16dfb2-bc9e-4f69-8405-215f3099498f
+# ╟─3f16dfb2-bc9e-4f69-8405-215f3099498f
 # ╟─8bae0730-f7bb-4b4e-9aef-98a749f5ff6a
 # ╟─40a80600-17de-4012-a8bf-4635485144ef
 # ╟─d12d3e20-4fc3-4240-8f3b-95c520117740
@@ -2760,7 +2720,7 @@ version = "1.13.0+0"
 # ╟─d1bc6120-b769-4394-9a46-946c00f533df
 # ╟─e6234d9e-e212-4c3e-b3a0-58a918bd1ccf
 # ╟─c92b69a9-3f28-4f4f-9825-a64826b81895
-# ╟─d4a4270c-5323-40e0-83c8-25f1fca65b00
+# ╠═d4a4270c-5323-40e0-83c8-25f1fca65b00
 # ╟─b6b58248-d1ef-49ae-96b3-2f36567a9ca2
 # ╟─5d83cb24-86b5-44dc-b4e2-81d12666cabf
 # ╟─289c9bc6-8627-46cd-b07d-820a9f86855d
