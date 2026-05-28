@@ -257,6 +257,11 @@ md"""
 $(LocalResource("./fig/BS92.png"))
 """
 
+# ╔═╡ 9a3e0620-0353-4437-b2ed-c21e8f5e0da3
+md"""
+## Cellular automaton
+"""
+
 # ╔═╡ dc828c07-7650-41ca-87b0-ca71378eecf2
 md"""
 ## Burgess 2013
@@ -323,19 +328,16 @@ md"""
 $(LocalResource("fig/sediment-buffer.svg"))
 """
 
-# ╔═╡ a0066da2-bf7a-410e-8684-3899609b5e01
-md"""
-## ALCAP Model
-"""
-
-# ╔═╡ 99476a07-99e2-4d5d-84d9-313c4d52bc16
-summary_plot(alcap_output)
-
 # ╔═╡ dbaff53b-0fc3-4886-ad53-ae1cc1faa7bc
 md"""
 # Visualization
 
 $(LocalResource("fig/alcaps-alternative.png"))
+"""
+
+# ╔═╡ 65b0bc8a-8b91-45a4-b868-bf3d30c46460
+md"""
+## Types of diagrams
 """
 
 # ╔═╡ da9142a3-e966-4d36-b2e7-a559d233292e
@@ -382,6 +384,11 @@ output_spec = Dict(
 	:profile => OutputSpec(slice=(:, 25))
 )
 ```
+"""
+
+# ╔═╡ e9f812a9-2b5c-4ad1-9419-0cb5261291aa
+md"""
+## Input
 """
 
 # ╔═╡ 126ff04f-5956-4d51-aa31-96bebd656032
@@ -614,8 +621,6 @@ end
 
 # ╔═╡ 5c2d4e05-b8b7-416f-b56d-c9b73ab72858
 TwoColumn(md"""
-# Cellular automaton 
-		  
 - Dispersal, facilitation, competition
 - Not the actual biological process, but useful heuristic
 - Unique ruleset: infinite heterogeneity (never converges on a fixed distribution)
@@ -639,8 +644,6 @@ $(LocalResource("fig/active-layer-export.svg"))
 
 # ╔═╡ 9db54abf-52b0-4884-9d69-30e3ea9507ea
 TwoColumn(md"""
-## Types of diagrams
-
 - Sediment profile
 - Stratigraphic column
 - Age-depth model
@@ -2766,6 +2769,7 @@ version = "1.13.0+0"
 # ╟─bb797b6f-47c2-4ebc-a096-ed2e8cd0b9ff
 # ╟─6f6fa95d-b163-4cc6-ab3c-9bc86083d54d
 # ╟─afa830cf-f4ce-442d-9649-3e912893052c
+# ╟─9a3e0620-0353-4437-b2ed-c21e8f5e0da3
 # ╟─5c2d4e05-b8b7-416f-b56d-c9b73ab72858
 # ╟─dc828c07-7650-41ca-87b0-ca71378eecf2
 # ╟─a4edb5e9-995c-42eb-89f8-d7f85dfb8dc1
@@ -2774,21 +2778,21 @@ version = "1.13.0+0"
 # ╟─2df751f2-0a2a-42d7-9d0f-3db4af3a8f5d
 # ╠═f14d4f60-75c0-4c75-acb1-8de730aaf952
 # ╟─dcabbeb1-4384-4841-b26c-213887feba61
-# ╠═86219909-5970-47fd-aad6-0d2698d5cdd3
+# ╟─86219909-5970-47fd-aad6-0d2698d5cdd3
 # ╟─042b5bf9-5c77-436a-be74-d3949b2f84f2
-# ╠═8916e66a-2f60-479d-bce9-f4f505e6ef31
-# ╟─a0066da2-bf7a-410e-8684-3899609b5e01
-# ╠═99476a07-99e2-4d5d-84d9-313c4d52bc16
+# ╟─8916e66a-2f60-479d-bce9-f4f505e6ef31
 # ╟─dbaff53b-0fc3-4886-ad53-ae1cc1faa7bc
-# ╟─9db54abf-52b0-4884-9d69-30e3ea9507ea
+# ╟─65b0bc8a-8b91-45a4-b868-bf3d30c46460
+# ╠═9db54abf-52b0-4884-9d69-30e3ea9507ea
 # ╟─da9142a3-e966-4d36-b2e7-a559d233292e
 # ╟─bf8a9983-f8e2-4640-b6eb-d3e5ce9aa317
 # ╟─1ccdb93b-33a5-441e-86b1-ab2b1e085ad5
 # ╟─cc443da5-fbbe-473f-aa8a-a526cc37fce5
 # ╟─e267e3f6-c0b9-486f-8c0c-c2ce202e2b29
+# ╟─e9f812a9-2b5c-4ad1-9419-0cb5261291aa
 # ╟─ded8a137-8111-4912-841b-30eaff4c7fc0
 # ╟─126ff04f-5956-4d51-aa31-96bebd656032
-# ╠═cd7142f8-443d-4b8c-971c-7a480bbde06d
+# ╟─cd7142f8-443d-4b8c-971c-7a480bbde06d
 # ╟─e67cd7cf-2c25-41d6-bc2b-7ffa9162e456
 # ╟─f36c4f74-6177-4a63-87e2-910ef94f16fc
 # ╟─a00ef21a-dee2-49b3-8cef-ba03313ae8c1
