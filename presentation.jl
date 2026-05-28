@@ -241,7 +241,7 @@ $(LocalResource("./fig/flowchart.svg"))
 
 # ╔═╡ bb797b6f-47c2-4ebc-a096-ed2e8cd0b9ff
 md"""
-## Carbonate Production
+# Carbonate Production
 **0-d model, based on ODE** (Bosscher & Schlager 1992)
 
 $$\partial_t h = -g_m {\rm tanh}\left[\frac{I_0}{I_k} \exp(-k (h - s(t)))\right].$$
@@ -299,7 +299,7 @@ let
 end
 
 # ╔═╡ dcabbeb1-4384-4841-b26c-213887feba61
-md"## Active Layer Diffusion"
+md"# Active Layer Transport"
 
 # ╔═╡ 042b5bf9-5c77-436a-be74-d3949b2f84f2
 md"""
@@ -332,7 +332,7 @@ summary_plot(alcap_output)
 
 # ╔═╡ cd7142f8-443d-4b8c-971c-7a480bbde06d
 md"""
-## Denudation
+# Denudation
 When the carbonates are subaerially exposed, they undergo denudation (dissolution + erosion).
 
 A handful of studies incorporate up-to-date knowledge from landscape evolution into carbonate platform denudation.
@@ -2628,7 +2628,7 @@ version = "1.13.0+0"
 # ╟─3f16dfb2-bc9e-4f69-8405-215f3099498f
 # ╟─8bae0730-f7bb-4b4e-9aef-98a749f5ff6a
 # ╟─40a80600-17de-4012-a8bf-4635485144ef
-# ╠═d12d3e20-4fc3-4240-8f3b-95c520117740
+# ╟─d12d3e20-4fc3-4240-8f3b-95c520117740
 # ╟─bb797b6f-47c2-4ebc-a096-ed2e8cd0b9ff
 # ╟─6f6fa95d-b163-4cc6-ab3c-9bc86083d54d
 # ╟─afa830cf-f4ce-442d-9649-3e912893052c
@@ -2638,13 +2638,13 @@ version = "1.13.0+0"
 # ╟─a4edb5e9-995c-42eb-89f8-d7f85dfb8dc1
 # ╟─e0e0bc64-c691-471e-8594-ccdf352887f4
 # ╟─f9d9216c-53ab-4878-8701-8877f2ee3dcb
-# ╟─dcabbeb1-4384-4841-b26c-213887feba61
+# ╠═dcabbeb1-4384-4841-b26c-213887feba61
 # ╟─86219909-5970-47fd-aad6-0d2698d5cdd3
-# ╠═042b5bf9-5c77-436a-be74-d3949b2f84f2
+# ╟─042b5bf9-5c77-436a-be74-d3949b2f84f2
 # ╟─8916e66a-2f60-479d-bce9-f4f505e6ef31
 # ╟─a0066da2-bf7a-410e-8684-3899609b5e01
 # ╠═99476a07-99e2-4d5d-84d9-313c4d52bc16
-# ╟─cd7142f8-443d-4b8c-971c-7a480bbde06d
+# ╠═cd7142f8-443d-4b8c-971c-7a480bbde06d
 # ╟─a00ef21a-dee2-49b3-8cef-ba03313ae8c1
 # ╟─d1bc6120-b769-4394-9a46-946c00f533df
 # ╟─e6234d9e-e212-4c3e-b3a0-58a918bd1ccf
