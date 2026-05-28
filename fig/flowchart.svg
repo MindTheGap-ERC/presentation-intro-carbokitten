@@ -1,0 +1,119 @@
+<?xml version="1.0" standalone="no" ?>
+<svg viewBox="-5 -5 390 280" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<style>
+
+
+#background {
+    fill: white;
+}
+
+#arrow {
+    fill: rgb(50, 100, 160);
+}
+
+.edge {
+    stroke-width: 2pt;
+    fill: none;
+    stroke: rgb(50, 100, 160);
+}
+
+.node rect {
+    fill: white;
+    stroke: black;
+}
+
+.node text {
+    fill: black;
+    text-anchor: middle;
+    dominant-baseline: middle;
+}
+
+.shadow-box {
+    fill: #eee;
+}
+
+.state .top-state-box {
+    fill: rgb(230, 220, 170);
+    stroke: none;
+}
+
+.state text {
+    fill: black;
+    text-anchor: middle;
+    dominant-baseline: middle;
+}
+
+</style>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+<path d="M 0 0 L 10 5 L 0 10 z" />
+</marker>
+</defs>
+<g id="root">
+<g class="state" id="ca">
+<rect class="shadow-box" x="242" y="7" width="140" height="40" />
+<rect class="top-state-box" x="240" y="5" width="140" height="40" />
+<text x="260" y="25">
+CA
+</text>
+</g>
+<g class="state" id="sediment-buffer">
+<rect class="shadow-box" x="2" y="92" width="280" height="60" />
+<rect class="top-state-box" x="0" y="90" width="280" height="60" />
+<text x="140" y="105">
+SEDIMENT BUFFER
+</text>
+</g>
+<g class="state" id="active-layer">
+<rect class="shadow-box" x="2" y="197" width="280" height="60" />
+<rect class="top-state-box" x="0" y="195" width="280" height="60" />
+<text x="140" y="210">
+ACTIVE LAYER
+</text>
+</g>
+<line class="edge" x1="330" y1="35" x2="330" y2="120" marker-end="url(#arrow)" />
+<path class="edge" d="M 180 25 A 150 95 0 0 1 330 120" marker-end="url(#arrow)" />
+<path class="edge" d="M 180 25 A 50 95 0 0 1 230 120" marker-end="url(#arrow)" />
+<path class="edge" d="M 330 140 A 150 95 0 0 1 180 235" marker-end="url(#arrow)" />
+<path class="edge" d="M 230 140 A 50 95 0 0 1 180 235" marker-end="url(#arrow)" />
+<path class="edge" d="M 100 235 A 50 95 0 0 1 50 140" marker-end="url(#arrow)" />
+<path class="edge" d="M 50 120 A 50 95 0 0 1 100 25" marker-end="url(#arrow)" />
+<path class="edge" d="M 166 245 A 26.64 32.0 0 0 1 114 245" marker-start="url(#arrow)" />
+<g class="node" transform="translate(140 25)">
+<rect rx="5" ry="5" x="-40" y="-10" width="80" height="20" />
+<text font-size="smaller">
+time step
+</text>
+</g>
+<g class="node" transform="translate(330 130)">
+<rect rx="5" ry="5" x="-40" y="-10" width="80" height="20" />
+<text font-size="smaller">
+produce
+</text>
+</g>
+<g class="node" transform="translate(330 25)">
+<rect rx="5" ry="5" x="-40" y="-10" width="80" height="20" />
+<text font-size="smaller">
+evolve
+</text>
+</g>
+<g class="node" transform="translate(230 130)">
+<rect rx="5" ry="5" x="-40" y="-10" width="80" height="20" />
+<text font-size="smaller">
+disintegrate
+</text>
+</g>
+<g class="node" transform="translate(140 235)">
+<rect rx="5" ry="5" x="-40" y="-10" width="80" height="20" />
+<text font-size="smaller">
+transport
+</text>
+</g>
+<g class="node" transform="translate(50 130)">
+<rect rx="5" ry="5" x="-40" y="-10" width="80" height="20" />
+<text font-size="smaller">
+lithify
+</text>
+</g>
+</g>
+</svg>
