@@ -35,6 +35,7 @@ begin
 	using Unitful
 	using CarboKitten
 	using GraphvizDotLang
+	using Loess
 	TableOfContents()
 end
 
@@ -42,49 +43,9 @@ end
 begin
 	using CarboKitten.Models: BS92
 	using CarboKitten: DataSets
-	using CarboKitten.Visualization: summary_plot
+	using CarboKitten.Visualization
+	using CarboKitten.Export: read_volume, read_slice
 	using Interpolations: linear_interpolation
-end
-
-# ╔═╡ c510433d-23d7-45f4-8df8-85f896f15173
-cap_output = let
-	using CarboKitten.Models: CAP
-	
-	FACIES = [
-	    CAP.Facies(
-        maximum_growth_rate = 500u"m/Myr",
-        extinction_coefficient = 0.8u"m^-1",
-        saturation_intensity = 60u"W/m^2"),
-
-	    CAP.Facies(
-        maximum_growth_rate = 400u"m/Myr",
-        extinction_coefficient = 0.1u"m^-1",
-        saturation_intensity = 60u"W/m^2"),
-
-	    CAP.Facies(
-        maximum_growth_rate = 100u"m/Myr",
-        extinction_coefficient = 0.005u"m^-1",
-        saturation_intensity = 60u"W/m^2")
-	]
-
-	function sea_level(t)
-		10.0u"m" * sin(2π * t / 0.3u"Myr") + 3.0u"m" * sin(2π * t / 0.05u"Myr")
-	end
-	
-	INPUT = CAP.Input(
-		tag = "cap1",
-		box = CarboKitten.Box{Coast}(grid_size=(100, 50), phys_scale=150.0u"m"),
-		time = TimeProperties(
-			Δt = 200.0u"yr",
-			steps = 5000),
-		output = Dict(:full => OutputSpec(write_interval=10)),
-		sea_level = sea_level,
-		initial_topography = (x, y) -> - x / 300.0,
-		subsidence_rate = 50.0u"m/Myr",
-		insolation = 400.0u"W/m^2",
-		facies = FACIES)
-
-	run_model(Model{CAP}, INPUT, "cap.h5")
 end
 
 # ╔═╡ d775081d-733c-4d0a-ab33-f721d8074604
@@ -97,21 +58,21 @@ alcap_output = let
                 maximum_growth_rate = 500u"m/Myr",
                 extinction_coefficient = 0.8u"m^-1",
                 saturation_intensity = 60u"W/m^2"),
-		    transport_coefficient = 10u"m/Myr"),
+		    transport_coefficient = 50u"m/yr"),
 
 	    ALCAP.Facies(
             production = BenthicProduction(
                 maximum_growth_rate = 400u"m/Myr",
                 extinction_coefficient = 0.1u"m^-1",
                 saturation_intensity = 60u"W/m^2"),
-		    transport_coefficient = 2.5u"m/Myr"),
+		    transport_coefficient = 25.0u"m/yr"),
 
 	    ALCAP.Facies(
             production = BenthicProduction(
                 maximum_growth_rate = 100u"m/Myr",
                 extinction_coefficient = 0.005u"m^-1",
                 saturation_intensity = 60u"W/m^2"),
-		    transport_coefficient = 5u"m/Myr")
+		    transport_coefficient = 12.5u"m/yr")
 	]
 
 	function sea_level(t)
@@ -124,7 +85,8 @@ alcap_output = let
 		time = TimeProperties(
 			Δt = 200.0u"yr",
 			steps = 5000),
-		output = Dict(:full => OutputSpec(write_interval=10)),
+		output = Dict(:full => OutputSpec(write_interval=10),
+            :profile => OutputSpec(slice=(:,25))),
 		sea_level = sea_level,
 		initial_topography = (x, y) -> - x / 300.0,
 		subsidence_rate = 50.0u"m/Myr",
@@ -132,9 +94,92 @@ alcap_output = let
 		facies = FACIES,
 		depositional_resolution = 0.5u"m",
 		sediment_buffer_size = 50,
-		disintegration_rate = 50.0u"m/Myr")
+		disintegration_rate = 50.0u"m/Myr",
+        lithification_time=100.0u"yr")
 
 	run_model(Model{ALCAP}, INPUT, "alcap.h5")
+end
+
+# ╔═╡ 3430e347-119a-4efb-aeb9-a197f7456030
+module CAFeedbackExample
+    using CarboKitten
+    using CarboKitten.Production
+    using CarboKitten.Models: ALCAP as M
+
+    initial_topography(x, y) =
+        min(0.0u"m", - sqrt((x - 7.5u"km")^2 + (y - 7.5u"km")^2) / 100.0 + 20.0u"m")
+
+    function main()
+        res = 100
+        steps = 5000
+        phys_scale = 15.0u"km" / res
+
+        output = Dict(
+            :topography => OutputSpec(write_interval = max(1, div(steps, 50))),
+            :profile    => OutputSpec(slice = (:, div(res, 2)+1)))
+
+        facies(feedback) = [
+            M.Facies(
+                name="euphotic",
+                activation_range=(4, 10),
+                viability_range=(1, 10),
+                production=Production.EXAMPLE[:euphotic],
+                transport_coefficient=10.0u"m/yr",
+                minimum_production=feedback ? 0.01u"m/Myr" : nothing),
+            M.Facies(
+                name="oligophotic",
+                production=BenthicProduction(
+                    maximum_growth_rate=200.0u"m/Myr",
+                    extinction_coefficient=0.1u"m^-1",
+                    saturation_intensity=60u"W/m^2"
+                ),
+                transport_coefficient=5.0u"m/yr",
+                minimum_production=feedback ? 5.0u"m/Myr" : nothing),
+            M.Facies(
+                name="pelagic",
+                active=false,
+                production=PelagicProduction(
+                    maximum_growth_rate=1.0u"1/Myr",
+                    extinction_coefficient=0.1u"m^-1",
+                    saturation_intensity=60u"W/m^2"
+                ),
+                transport_coefficient=20.0u"m/yr",
+                # minimum_production=10.0u"m/Myr"
+            )
+        ]
+
+        box = CarboKitten.Box{Periodic{2}}(grid_size=(res, res), phys_scale=phys_scale)
+
+        time_param = TimeProperties(Δt=1.0u"Myr"/steps, steps=steps)
+
+        sea_level(t) =
+            10.0u"m" * sin(2π * t / 123456.0u"yr") +
+             5.0u"m" * sin(2π * t /  80456.0u"yr")
+
+        input(feedback) = M.Input(
+            time = time_param,
+            box = box,
+            facies = facies(feedback),
+            output = output,
+
+            sea_level = sea_level,
+            initial_topography = initial_topography,
+            ca_interval = 10,
+
+            insolation = 400.0u"W/m^2",
+            subsidence_rate = 30.0u"m/Myr",
+            disintegration_rate = 20.0u"m/Myr",
+            lithification_time = 100.0u"yr",
+
+            sediment_buffer_size=50,
+            depositional_resolution=0.5u"m",
+
+            # diagnostics=true
+        )
+
+        run_model(Model{M}, input(false), "ca-wo-feedback.h5")
+        run_model(Model{M}, input(true), "ca-feedback.h5")
+    end
 end
 
 # ╔═╡ eba9dfe7-1ba9-4937-b4c4-439fb521ff15
@@ -153,11 +198,15 @@ md"""
 $(PlutoUI.LocalResource.(["./fig/erc.png", "./fig/uu.png", "./fig/nlesc.png"], :height => 80)...)
 """
 
-# ╔═╡ 726a44e0-819e-44d5-ac52-b03ca052e3e8
-md"""## Carbonate Platforms"""
+# ╔═╡ 98138204-672e-4856-8412-3829cb2fa793
+md"""
+## Carbonate Platforms
+"""
 
-# ╔═╡ f9812c71-da1f-408f-800b-f42bbb9151b3
-md"""## Why this is hard"""
+# ╔═╡ 636dbfe6-e4d5-4251-88e9-50282d0d614f
+md"""
+## Why this is hard
+"""
 
 # ╔═╡ d3f8125a-7b59-4ac4-94f1-61fce8903b4b
 # ╠═╡ disabled = true
@@ -240,6 +289,11 @@ md"""
 # Towards a FOSS carbonate stratigraphic forward model 
 """
 
+# ╔═╡ db6fadc9-4552-4a69-8bf3-3bae69c329dd
+md"""
+## Existing Software
+"""
+
 # ╔═╡ 8bae0730-f7bb-4b4e-9aef-98a749f5ff6a
 md"""
 ## Incompleteness may substantially bias our interpretations 
@@ -266,12 +320,12 @@ Our flagship features:
 # ╔═╡ d12d3e20-4fc3-4240-8f3b-95c520117740
 md"""## CarboKitten's architecture
 
-$(LocalResource("./fig/flowchart.png"))
+$(LocalResource("./fig/flowchart.svg"))
 """
 
 # ╔═╡ bb797b6f-47c2-4ebc-a096-ed2e8cd0b9ff
 md"""
-## Carbonate Production
+# Carbonate Production
 **0-d model, based on ODE** (Bosscher & Schlager 1992)
 
 $$\partial_t h = -g_m {\rm tanh}\left[\frac{I_0}{I_k} \exp(-k (h - s(t)))\right].$$
@@ -288,6 +342,11 @@ md"""
 ## Reproducing BS92
 
 $(LocalResource("./fig/BS92.png"))
+"""
+
+# ╔═╡ 5b17e7e3-9ba8-45d7-81b6-935f4e6c7c58
+md"""
+# Cellular automaton 
 """
 
 # ╔═╡ dc828c07-7650-41ca-87b0-ca71378eecf2
@@ -323,23 +382,14 @@ let
 	fig
 end
 
-# ╔═╡ 2df751f2-0a2a-42d7-9d0f-3db4af3a8f5d
-md"""
-## CA-Driven Production
-"""
-
-# ╔═╡ f14d4f60-75c0-4c75-acb1-8de730aaf952
-summary_plot(cap_output)
-
 # ╔═╡ dcabbeb1-4384-4841-b26c-213887feba61
-md"## Active Layer Diffusion"
+md"# Active Layer Transport"
 
 # ╔═╡ 042b5bf9-5c77-436a-be74-d3949b2f84f2
 md"""
 ## Slide of unnecessary detail
 
 - Sediment flux: ${\bf q}_f = -\nu_f C_f {\bf \nabla} h$, where $C_f$ is concentration of entrained sediment and $\nu_f$ is a diffusion rate.
-- Instead of concentration $C_f$, use production $P_f$ directly.
 - Insert the flux into the mass balance:
 
   $$\sigma + \partial_t h = -\sum_f ({\bf \nabla} \cdot {\bf q}_f + P_f)$$
@@ -363,6 +413,48 @@ md"""
 
 # ╔═╡ 99476a07-99e2-4d5d-84d9-313c4d52bc16
 summary_plot(alcap_output)
+
+# ╔═╡ e67cd7cf-2c25-41d6-bc2b-7ffa9162e456
+md"""
+## CA Feedback
+
+- Kill factories that don't produce enough.
+"""
+
+# ╔═╡ f36c4f74-6177-4a63-87e2-910ef94f16fc
+begin
+	GLMakie.activate!()
+	fig = Figure(size=(1000, 800))
+	
+	header, topography = read_volume("ca-wo-feedback.h5", :topography)
+	_, profile = read_slice("ca-wo-feedback.h5", :profile)
+	
+	ax1 = Axis(fig[1, 1:2])
+	sediment_profile!(ax1, header, profile)
+	ax1.title = "without feedback"
+	
+	ax1_wh1 = Axis(fig[3, 1])
+	ax1_wh2 = Axis(fig[3, 2])
+	sa, ft = wheeler_diagram!(ax1_wh1, ax1_wh2, header, profile)
+	Colorbar(fig[2, 1], sa; vertical=false, label="sediment accumulation [m/Myr]")
+	Colorbar(fig[2, 2], ft; vertical=false, ticks=1:3, label="dominant facies")
+	
+	header, topography = read_volume("ca-feedback.h5", :topography)
+	_, profile = read_slice("ca-feedback.h5", :profile)
+	
+	ax2 = Axis(fig[1, 3:4])
+	sediment_profile!(ax2, header, profile)
+	ax2.title = "with feedback"
+	
+	ax2_wh1 = Axis(fig[3, 3])
+	ax2_wh2 = Axis(fig[3, 4])
+	sa, ft = wheeler_diagram!(ax2_wh1, ax2_wh2, header, profile)
+	
+	Colorbar(fig[2, 3], sa; vertical=false, label="sediment accumulation [m/Myr]")
+	Colorbar(fig[2, 4], ft; vertical=false, ticks=1:3, label="dominant facies")
+	
+	fig
+end
 
 # ╔═╡ cd7142f8-443d-4b8c-971c-7a480bbde06d
 md"""
@@ -472,6 +564,8 @@ md"""
 """
 
 # ╔═╡ 6ee4b02a-2d84-465c-970b-4fc8c44c33fd
+# ╠═╡ disabled = true
+#=╠═╡
 begin
 	@kwdef struct TwoColumn{L, R}
 	    left::L
@@ -487,6 +581,12 @@ begin
 	    write(io, """</div></div>""")
 	end
 end
+  ╠═╡ =#
+
+# ╔═╡ b47fb5cf-1a5d-4e78-821e-c247794ba65b
+function TwoColumn(left, right, frac)
+	PlutoUI.ExperimentalLayout.grid([left right])
+end
 
 # ╔═╡ 02c49ad8-8a82-456a-9374-d21042bb1bc1
 TwoColumn(md"""
@@ -500,8 +600,8 @@ TwoColumn(md"""
 Utrecht, May 28, 2026
 """, PlutoUI.LocalResource("./fig/mind-the-gap.png", :width=>200), 70)
 
-# ╔═╡ e32ba22a-034f-430f-83ce-1774a26b7429
-TwoColumn(md"""
+# ╔═╡ dc6d8d67-91b1-45ab-b7b0-996b752112bf
+TwoColumn(md"""          
 **Primary control over sediment production:**
 
 - Biomineralizing organisms
@@ -521,8 +621,6 @@ $(LocalResource("./fig/Bahamabank.jpg", :height=>400))
 
 # ╔═╡ fe8d2c6e-a124-4561-8864-e40cf00ca177
 TwoColumn(md"""
-
-	
 **Complexity**
 
 - Not just transport
@@ -554,8 +652,6 @@ This makes carbonate an important target to study. As a geoscientist, investigat
 begin
 md"""## Existing Software"""
 TwoColumn(md"""
-
-		  
 Not open source:
 - CARBONATE 3D
 - CARB3D+
@@ -574,8 +670,6 @@ end
 
 # ╔═╡ 5c2d4e05-b8b7-416f-b56d-c9b73ab72858
 TwoColumn(md"""
-# Cellular automaton 
-		  
 - Dispersal, facilitation, competition
 - Not the actual biological process, but useful heuristic
 - Unique ruleset: infinite heterogeneity (never converges on a fixed distribution)
@@ -638,7 +732,7 @@ summary_plot(bs92_output)
 
 # ╔═╡ 3f86f55e-e56b-41b1-bff5-f05eeda0fbdf
 model = let
-	df = miller_2020()
+	df = DataSets.miller_2020()
 	ldf = df[df.refkey .== "846 Lisiecki", :]
 	loess(ldf.time |> in_units_of(u"Myr"), ldf.sealevel |> in_units_of(u"m"), span=0.005)
 end
@@ -655,6 +749,9 @@ let
 	fig
 end
 
+# ╔═╡ 2a82d293-4313-4591-b7f3-17599391ebd2
+CAFeedbackExample.main()
+
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
@@ -662,6 +759,7 @@ CarboKitten = "690c6d5c-626a-429f-a06b-981a1dae1c19"
 GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
 GraphvizDotLang = "6039e64d-d8b8-4c93-8e43-7efd2f757352"
 Interpolations = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
+Loess = "4345ca2d-374a-55d4-8d30-97f9976e7612"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 
@@ -670,7 +768,8 @@ CarboKitten = "~0.6.0"
 GLMakie = "~0.13.10"
 GraphvizDotLang = "~0.2.1"
 Interpolations = "~0.16.2"
-PlutoUI = "~0.7.80"
+Loess = "~0.6.5"
+PlutoUI = "~0.7.60"
 Unitful = "~1.28.0"
 """
 
@@ -682,6 +781,7 @@ julia_version = "1.12.6"
 julia_version = "1.12.6"
 manifest_format = "2.0"
 project_hash = "cc4d31c96150bb1f99f0eea26a0bef70bb9640ca"
+project_hash = "b4f755476d374819fdae47cab927162d1af4053b"
 
 [[deps.AbstractFFTs]]
 deps = ["LinearAlgebra"]
@@ -996,6 +1096,17 @@ deps = ["Mmap"]
 git-tree-sha1 = "9e2f36d3c96a820c678f2f1f1782582fcf685bae"
 uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 version = "1.9.1"
+
+[[deps.Distances]]
+deps = ["LinearAlgebra", "Statistics", "StatsAPI"]
+git-tree-sha1 = "c7e3a542b999843086e2f29dac96a618c105be1d"
+uuid = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"
+version = "0.10.12"
+weakdeps = ["ChainRulesCore", "SparseArrays"]
+
+    [deps.Distances.extensions]
+    DistancesChainRulesCoreExt = "ChainRulesCore"
+    DistancesSparseArraysExt = "SparseArrays"
 
 [[deps.Distributed]]
 deps = ["Random", "Serialization", "Sockets"]
@@ -1616,6 +1727,12 @@ version = "2.42.0+0"
 deps = ["Libdl", "OpenBLAS_jll", "libblastrampoline_jll"]
 uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 version = "1.12.0"
+
+[[deps.Loess]]
+deps = ["Distances", "LinearAlgebra", "Statistics", "StatsAPI", "StatsFuns"]
+git-tree-sha1 = "b1ad83b367b915e2dc485dee3d62a6a6317d7ad4"
+uuid = "4345ca2d-374a-55d4-8d30-97f9976e7612"
+version = "0.6.5"
 
 [[deps.LogExpFunctions]]
 deps = ["DocStringExtensions", "IrrationalConstants", "LinearAlgebra"]
@@ -2698,6 +2815,9 @@ version = "1.13.0+0"
 # ╟─726a44e0-819e-44d5-ac52-b03ca052e3e8
 # ╟─e32ba22a-034f-430f-83ce-1774a26b7429
 # ╟─f9812c71-da1f-408f-800b-f42bbb9151b3
+# ╟─98138204-672e-4856-8412-3829cb2fa793
+# ╟─dc6d8d67-91b1-45ab-b7b0-996b752112bf
+# ╟─636dbfe6-e4d5-4251-88e9-50282d0d614f
 # ╟─fe8d2c6e-a124-4561-8864-e40cf00ca177
 # ╟─d3f8125a-7b59-4ac4-94f1-61fce8903b4b
 # ╟─741bbf64-5b80-4e5c-b53e-98d756d68ef6
@@ -2705,6 +2825,7 @@ version = "1.13.0+0"
 # ╟─6b5d1935-0773-4933-ae56-b5b88b81f87e
 # ╟─3dd47c47-2e3a-4970-982d-b1c2eb9cfdd7
 # ╟─e9754cdc-1180-4bc5-b87c-a11d659d33aa
+# ╟─db6fadc9-4552-4a69-8bf3-3bae69c329dd
 # ╟─3f16dfb2-bc9e-4f69-8405-215f3099498f
 # ╟─8bae0730-f7bb-4b4e-9aef-98a749f5ff6a
 # ╟─40a80600-17de-4012-a8bf-4635485144ef
@@ -2712,20 +2833,21 @@ version = "1.13.0+0"
 # ╟─bb797b6f-47c2-4ebc-a096-ed2e8cd0b9ff
 # ╟─6f6fa95d-b163-4cc6-ab3c-9bc86083d54d
 # ╟─afa830cf-f4ce-442d-9649-3e912893052c
+# ╟─5b17e7e3-9ba8-45d7-81b6-935f4e6c7c58
 # ╟─5c2d4e05-b8b7-416f-b56d-c9b73ab72858
 # ╟─dc828c07-7650-41ca-87b0-ca71378eecf2
 # ╟─a4edb5e9-995c-42eb-89f8-d7f85dfb8dc1
 # ╟─e0e0bc64-c691-471e-8594-ccdf352887f4
 # ╟─f9d9216c-53ab-4878-8701-8877f2ee3dcb
-# ╟─2df751f2-0a2a-42d7-9d0f-3db4af3a8f5d
-# ╠═f14d4f60-75c0-4c75-acb1-8de730aaf952
 # ╟─dcabbeb1-4384-4841-b26c-213887feba61
 # ╟─86219909-5970-47fd-aad6-0d2698d5cdd3
 # ╟─042b5bf9-5c77-436a-be74-d3949b2f84f2
 # ╟─8916e66a-2f60-479d-bce9-f4f505e6ef31
 # ╟─a0066da2-bf7a-410e-8684-3899609b5e01
-# ╟─99476a07-99e2-4d5d-84d9-313c4d52bc16
-# ╟─cd7142f8-443d-4b8c-971c-7a480bbde06d
+# ╠═99476a07-99e2-4d5d-84d9-313c4d52bc16
+# ╟─e67cd7cf-2c25-41d6-bc2b-7ffa9162e456
+# ╟─f36c4f74-6177-4a63-87e2-910ef94f16fc
+# ╠═cd7142f8-443d-4b8c-971c-7a480bbde06d
 # ╟─a00ef21a-dee2-49b3-8cef-ba03313ae8c1
 # ╟─d1bc6120-b769-4394-9a46-946c00f533df
 # ╟─e6234d9e-e212-4c3e-b3a0-58a918bd1ccf
@@ -2740,10 +2862,12 @@ version = "1.13.0+0"
 # ╠═0dbd9cce-a006-11ef-365b-d388b63f5339
 # ╠═771e87fa-4ee7-4c66-b71f-7fbc99505f7c
 # ╠═6ee4b02a-2d84-465c-970b-4fc8c44c33fd
+# ╠═b47fb5cf-1a5d-4e78-821e-c247794ba65b
 # ╠═aa20619b-fe16-4b01-9532-8f6c6277d399
-# ╠═c510433d-23d7-45f4-8df8-85f896f15173
 # ╠═d775081d-733c-4d0a-ab33-f721d8074604
 # ╠═3f86f55e-e56b-41b1-bff5-f05eeda0fbdf
 # ╠═9cf75959-90ec-4cd2-8c00-a95a2ffb1340
+# ╠═3430e347-119a-4efb-aeb9-a197f7456030
+# ╠═2a82d293-4313-4591-b7f3-17599391ebd2
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
