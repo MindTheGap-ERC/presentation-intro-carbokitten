@@ -35,7 +35,6 @@ begin
 	using Unitful
 	using CarboKitten
 	using GraphvizDotLang
-	using Loess
 	TableOfContents()
 end
 
@@ -43,9 +42,49 @@ end
 begin
 	using CarboKitten.Models: BS92
 	using CarboKitten: DataSets
-	using CarboKitten.Visualization
-	using CarboKitten.Export: read_volume, read_slice
+	using CarboKitten.Visualization: summary_plot
 	using Interpolations: linear_interpolation
+end
+
+# ╔═╡ c510433d-23d7-45f4-8df8-85f896f15173
+cap_output = let
+	using CarboKitten.Models: CAP
+	
+	FACIES = [
+	    CAP.Facies(
+        maximum_growth_rate = 500u"m/Myr",
+        extinction_coefficient = 0.8u"m^-1",
+        saturation_intensity = 60u"W/m^2"),
+
+	    CAP.Facies(
+        maximum_growth_rate = 400u"m/Myr",
+        extinction_coefficient = 0.1u"m^-1",
+        saturation_intensity = 60u"W/m^2"),
+
+	    CAP.Facies(
+        maximum_growth_rate = 100u"m/Myr",
+        extinction_coefficient = 0.005u"m^-1",
+        saturation_intensity = 60u"W/m^2")
+	]
+
+	function sea_level(t)
+		10.0u"m" * sin(2π * t / 0.3u"Myr") + 3.0u"m" * sin(2π * t / 0.05u"Myr")
+	end
+	
+	INPUT = CAP.Input(
+		tag = "cap1",
+		box = CarboKitten.Box{Coast}(grid_size=(100, 50), phys_scale=150.0u"m"),
+		time = TimeProperties(
+			Δt = 200.0u"yr",
+			steps = 5000),
+		output = Dict(:full => OutputSpec(write_interval=10)),
+		sea_level = sea_level,
+		initial_topography = (x, y) -> - x / 300.0,
+		subsidence_rate = 50.0u"m/Myr",
+		insolation = 400.0u"W/m^2",
+		facies = FACIES)
+
+	run_model(Model{CAP}, INPUT, "cap.h5")
 end
 
 # ╔═╡ d775081d-733c-4d0a-ab33-f721d8074604
@@ -58,21 +97,21 @@ alcap_output = let
                 maximum_growth_rate = 500u"m/Myr",
                 extinction_coefficient = 0.8u"m^-1",
                 saturation_intensity = 60u"W/m^2"),
-		    transport_coefficient = 50u"m/yr"),
+		    transport_coefficient = 10u"m/Myr"),
 
 	    ALCAP.Facies(
             production = BenthicProduction(
                 maximum_growth_rate = 400u"m/Myr",
                 extinction_coefficient = 0.1u"m^-1",
                 saturation_intensity = 60u"W/m^2"),
-		    transport_coefficient = 25.0u"m/yr"),
+		    transport_coefficient = 2.5u"m/Myr"),
 
 	    ALCAP.Facies(
             production = BenthicProduction(
                 maximum_growth_rate = 100u"m/Myr",
                 extinction_coefficient = 0.005u"m^-1",
                 saturation_intensity = 60u"W/m^2"),
-		    transport_coefficient = 12.5u"m/yr")
+		    transport_coefficient = 5u"m/Myr")
 	]
 
 	function sea_level(t)
@@ -85,8 +124,7 @@ alcap_output = let
 		time = TimeProperties(
 			Δt = 200.0u"yr",
 			steps = 5000),
-		output = Dict(:full => OutputSpec(write_interval=10),
-            :profile => OutputSpec(slice=(:,25))),
+		output = Dict(:full => OutputSpec(write_interval=10)),
 		sea_level = sea_level,
 		initial_topography = (x, y) -> - x / 300.0,
 		subsidence_rate = 50.0u"m/Myr",
@@ -94,92 +132,9 @@ alcap_output = let
 		facies = FACIES,
 		depositional_resolution = 0.5u"m",
 		sediment_buffer_size = 50,
-		disintegration_rate = 50.0u"m/Myr",
-        lithification_time=100.0u"yr")
+		disintegration_rate = 50.0u"m/Myr")
 
 	run_model(Model{ALCAP}, INPUT, "alcap.h5")
-end
-
-# ╔═╡ 3430e347-119a-4efb-aeb9-a197f7456030
-module CAFeedbackExample
-    using CarboKitten
-    using CarboKitten.Production
-    using CarboKitten.Models: ALCAP as M
-
-    initial_topography(x, y) =
-        min(0.0u"m", - sqrt((x - 7.5u"km")^2 + (y - 7.5u"km")^2) / 100.0 + 20.0u"m")
-
-    function main()
-        res = 100
-        steps = 5000
-        phys_scale = 15.0u"km" / res
-
-        output = Dict(
-            :topography => OutputSpec(write_interval = max(1, div(steps, 50))),
-            :profile    => OutputSpec(slice = (:, div(res, 2)+1)))
-
-        facies(feedback) = [
-            M.Facies(
-                name="euphotic",
-                activation_range=(4, 10),
-                viability_range=(1, 10),
-                production=Production.EXAMPLE[:euphotic],
-                transport_coefficient=10.0u"m/yr",
-                minimum_production=feedback ? 0.01u"m/Myr" : nothing),
-            M.Facies(
-                name="oligophotic",
-                production=BenthicProduction(
-                    maximum_growth_rate=200.0u"m/Myr",
-                    extinction_coefficient=0.1u"m^-1",
-                    saturation_intensity=60u"W/m^2"
-                ),
-                transport_coefficient=5.0u"m/yr",
-                minimum_production=feedback ? 5.0u"m/Myr" : nothing),
-            M.Facies(
-                name="pelagic",
-                active=false,
-                production=PelagicProduction(
-                    maximum_growth_rate=1.0u"1/Myr",
-                    extinction_coefficient=0.1u"m^-1",
-                    saturation_intensity=60u"W/m^2"
-                ),
-                transport_coefficient=20.0u"m/yr",
-                # minimum_production=10.0u"m/Myr"
-            )
-        ]
-
-        box = CarboKitten.Box{Periodic{2}}(grid_size=(res, res), phys_scale=phys_scale)
-
-        time_param = TimeProperties(Δt=1.0u"Myr"/steps, steps=steps)
-
-        sea_level(t) =
-            10.0u"m" * sin(2π * t / 123456.0u"yr") +
-             5.0u"m" * sin(2π * t /  80456.0u"yr")
-
-        input(feedback) = M.Input(
-            time = time_param,
-            box = box,
-            facies = facies(feedback),
-            output = output,
-
-            sea_level = sea_level,
-            initial_topography = initial_topography,
-            ca_interval = 10,
-
-            insolation = 400.0u"W/m^2",
-            subsidence_rate = 30.0u"m/Myr",
-            disintegration_rate = 20.0u"m/Myr",
-            lithification_time = 100.0u"yr",
-
-            sediment_buffer_size=50,
-            depositional_resolution=0.5u"m",
-
-            # diagnostics=true
-        )
-
-        run_model(Model{M}, input(false), "ca-wo-feedback.h5")
-        run_model(Model{M}, input(true), "ca-feedback.h5")
-    end
 end
 
 # ╔═╡ eba9dfe7-1ba9-4937-b4c4-439fb521ff15
@@ -192,20 +147,17 @@ md"""
 # CarboKitten.jl
 """
 
+
 # ╔═╡ f7b4113e-16fe-4833-95f7-e38fccaa38b7
 md"""
 $(PlutoUI.LocalResource.(["./fig/erc.png", "./fig/uu.png", "./fig/nlesc.png"], :height => 80)...)
 """
 
-# ╔═╡ 98138204-672e-4856-8412-3829cb2fa793
-md"""
-## Carbonate Platforms
-"""
+# ╔═╡ 726a44e0-819e-44d5-ac52-b03ca052e3e8
+md"""## Carbonate Platforms"""
 
-# ╔═╡ 636dbfe6-e4d5-4251-88e9-50282d0d614f
-md"""
-## Why this is hard
-"""
+# ╔═╡ f9812c71-da1f-408f-800b-f42bbb9151b3
+md"""## Why this is hard"""
 
 # ╔═╡ d3f8125a-7b59-4ac4-94f1-61fce8903b4b
 # ╠═╡ disabled = true
@@ -249,50 +201,6 @@ $(LocalResource("./fig/SealevelBahamas.jpg"))
 """
 
 
-# ╔═╡ 7d7033f1-0443-410d-8e73-62eabb53ea9c
-# ╠═╡ disabled = true
-#=╠═╡
-md"""
-## Think about this...
-### You are only able to see, what stratigraphy allows you to see.
-$(LocalResource("fig/lightcolor.png"))
-**Stratigraphy is like the colored light here.**
-"""
-  ╠═╡ =#
-
-# ╔═╡ 6b5d1935-0773-4933-ae56-b5b88b81f87e
-# ╠═╡ disabled = true
-#=╠═╡
-md"""
-## So...
-### The key is to know what color is the light!
-**If we know the behaviour of stratigraphy, are we able to reconstruct the original information?**
-$(LocalResource("fig/WhyFM.jpg"))
-**How? Use forward modeling to understand the stratigraphy.**
-"""
-  ╠═╡ =#
-
-# ╔═╡ 3dd47c47-2e3a-4970-982d-b1c2eb9cfdd7
-# ╠═╡ disabled = true
-#=╠═╡
-md"""
-## Question 2
-**If the stratigraphy is incomplete, how much astronomical signals would you expect to be preserved?**
-
-Please bear in mind, and we may study this in practice later!
-"""
-  ╠═╡ =#
-
-# ╔═╡ e9754cdc-1180-4bc5-b87c-a11d659d33aa
-md"""
-# Towards a FOSS carbonate stratigraphic forward model 
-"""
-
-# ╔═╡ db6fadc9-4552-4a69-8bf3-3bae69c329dd
-md"""
-## Existing Software
-"""
-
 # ╔═╡ 8bae0730-f7bb-4b4e-9aef-98a749f5ff6a
 md"""
 ## Incompleteness may substantially bias our interpretations 
@@ -306,6 +214,11 @@ Incomplete stratigraphy will bias our interpretation of mode of evolution toward
 
 """
 
+# ╔═╡ e9754cdc-1180-4bc5-b87c-a11d659d33aa
+md"""
+# Towards a FOSS carbonate stratigraphic forward model 
+"""
+
 # ╔═╡ 40a80600-17de-4012-a8bf-4635485144ef
 md"# CarboKitten.jl
 
@@ -314,17 +227,18 @@ Our flagship features:
 - Carbonate production (Bosscher & Schlager 1992)
 - Ecological interactions leading to spatial heterogeneity (Burgess 2013)
 - Bespoke sediment transport model (Hidding et al. 2025)
+- Explicit control over physical units (`Unitful`)
 "
 
 # ╔═╡ d12d3e20-4fc3-4240-8f3b-95c520117740
 md"""## CarboKitten's architecture
 
-$(LocalResource("./fig/flowchart.svg"))
+$(LocalResource("./fig/flowchart.png"))
 """
 
 # ╔═╡ bb797b6f-47c2-4ebc-a096-ed2e8cd0b9ff
 md"""
-# Carbonate Production
+## Carbonate Production
 **0-d model, based on ODE** (Bosscher & Schlager 1992)
 
 $$\partial_t h = -g_m {\rm tanh}\left[\frac{I_0}{I_k} \exp(-k (h - s(t)))\right].$$
@@ -343,9 +257,9 @@ md"""
 $(LocalResource("./fig/BS92.png"))
 """
 
-# ╔═╡ 5b17e7e3-9ba8-45d7-81b6-935f4e6c7c58
+# ╔═╡ 9a3e0620-0353-4437-b2ed-c21e8f5e0da3
 md"""
-# Cellular automaton 
+## Cellular automaton
 """
 
 # ╔═╡ dc828c07-7650-41ca-87b0-ca71378eecf2
@@ -381,14 +295,23 @@ let
 	fig
 end
 
+# ╔═╡ 2df751f2-0a2a-42d7-9d0f-3db4af3a8f5d
+md"""
+## CA-Driven Production
+"""
+
+# ╔═╡ f14d4f60-75c0-4c75-acb1-8de730aaf952
+summary_plot(cap_output)
+
 # ╔═╡ dcabbeb1-4384-4841-b26c-213887feba61
-md"# Active Layer Transport"
+md"## Active Layer Diffusion"
 
 # ╔═╡ 042b5bf9-5c77-436a-be74-d3949b2f84f2
 md"""
 ## Slide of unnecessary detail
 
 - Sediment flux: ${\bf q}_f = -\nu_f C_f {\bf \nabla} h$, where $C_f$ is concentration of entrained sediment and $\nu_f$ is a diffusion rate.
+- Instead of concentration $C_f$, use production $P_f$ directly.
 - Insert the flux into the mass balance:
 
   $$\sigma + \partial_t h = -\sum_f ({\bf \nabla} \cdot {\bf q}_f + P_f)$$
@@ -405,13 +328,89 @@ md"""
 $(LocalResource("fig/sediment-buffer.svg"))
 """
 
-# ╔═╡ a0066da2-bf7a-410e-8684-3899609b5e01
+# ╔═╡ dbaff53b-0fc3-4886-ad53-ae1cc1faa7bc
 md"""
-## ALCAP Model
+# Visualization
+
+$(LocalResource("fig/alcaps-alternative.png"))
 """
 
-# ╔═╡ 99476a07-99e2-4d5d-84d9-313c4d52bc16
-summary_plot(alcap_output)
+# ╔═╡ 65b0bc8a-8b91-45a4-b868-bf3d30c46460
+md"""
+## Types of diagrams
+"""
+
+# ╔═╡ da9142a3-e966-4d36-b2e7-a559d233292e
+md"""
+### Sediment profile
+
+$(LocalResource("fig/profile_fraction.png"))
+"""
+
+# ╔═╡ bf8a9983-f8e2-4640-b6eb-d3e5ce9aa317
+md"""
+### Wheeler diagram
+
+$(LocalResource("fig/wheeler_diagram.png"))
+"""
+
+# ╔═╡ 1ccdb93b-33a5-441e-86b1-ab2b1e085ad5
+md"""
+### Age-depth model
+
+$(LocalResource("fig/adm.png"))
+"""
+
+# ╔═╡ cc443da5-fbbe-473f-aa8a-a526cc37fce5
+md"""
+### Topography
+
+$(LocalResource("fig/glamour_view.png"))
+"""
+
+# ╔═╡ e267e3f6-c0b9-486f-8c0c-c2ce202e2b29
+md"""
+# Input and output
+
+## Output
+
+- Default output format is HDF5, which includes metadata of each run
+- Alternatively user can output into memory 
+- User can select extent of saving (complete grid, slice, columns etc)
+- Functions for saving CSV for interoperability
+```{julia}
+output_spec = Dict(
+	:topography => OutputSpec(write_interval=100),
+	:profile => OutputSpec(slice=(:, 25))
+)
+```
+"""
+
+# ╔═╡ e9f812a9-2b5c-4ad1-9419-0cb5261291aa
+md"""
+## Input
+"""
+
+# ╔═╡ 126ff04f-5956-4d51-aa31-96bebd656032
+md"""
+## Input external insolation from a CSV file
+
+$(LocalResource("fig/variable-insolation.png"))
+"""
+
+# ╔═╡ cd7142f8-443d-4b8c-971c-7a480bbde06d
+md"""
+# Denudation
+When carbonates are subaerially exposed, they undergo denudation (dissolution + erosion).
+
+A handful of studies incorporate up-to-date knowledge from landscape evolution into carbonate platform denudation.
+
+We can use three ways to simulated denudation:
+- Chemical dissolution
+- Physical Erosion
+- Empirical rates derived from regression over Cl isotopes
+
+"""
 
 # ╔═╡ 154c8beb-1554-42ff-b863-741637a4d35c
 md"""
@@ -462,26 +461,13 @@ begin
 	fig
 end
 
-# ╔═╡ cd7142f8-443d-4b8c-971c-7a480bbde06d
-md"""
-# Denudation
-When the carbonates are subaerially exposed, they undergo denudation (dissolution + erosion).
-
-A handful of studies incorporate up-to-date knowledge from landscape evolution into carbonate platform denudation.
-
-We can use three ways to simulated denudation:
-- Dissolution
-- Physical Erosion
-- Emperical regression
-
-"""
-
 # ╔═╡ a00ef21a-dee2-49b3-8cef-ba03313ae8c1
 md"""
 
 ## Dissolution
 
-- Kinetic rate law
+Kinetic rate law
+
 $$F = \alpha (c_{eq}-c(z))$$
 $$D_{\rm average} = (I\times \frac{c_{eq}}{\rho})\ (1 – (\frac{\lambda}{z_0})\ (1 – e^{(\frac{-z_0}{\lambda})}))$$
 
@@ -491,8 +477,10 @@ $(LocalResource("fig/Dis.png"))
 # ╔═╡ d1bc6120-b769-4394-9a46-946c00f533df
 md""" 
 ## Physical erosion
-- Distribute sediments to neighboring cells based on slope.
+Distribute sediments to neighboring cells based on slope.
+
 $$D_{phys} = -k_v * (1 - I_f)^{1/3} |\nabla h|^{2/3}$$
+herein, D$_{phys}$ is denudation rate, k$_v$ is erodibility, I$_f$ is infiltration, and h is height.
 $(LocalResource("fig/Ero.png"))
 *Source: van Der Wiel et al., 2007*
 """
@@ -500,39 +488,44 @@ $(LocalResource("fig/Ero.png"))
 # ╔═╡ e6234d9e-e212-4c3e-b3a0-58a918bd1ccf
 md"""
 ## Regression from Cl isotope observations
-- $$D = P × S$$
+$$D_{emp} = P × S$$
+Herein, D$_{emp}$ is denudation rate, P is precipitation and S is slope.  
 """
 
-# ╔═╡ 289c9bc6-8627-46cd-b07d-820a9f86855d
+# ╔═╡ d4a4270c-5323-40e0-83c8-25f1fca65b00
 md"""
-# CarboKitten 1.0
-
-- We need your input!
+# Modern case study from the Bahamas
+Modelling of facies heterogeneity is achieved using Cellular Automata and indrectly accounts for external forcing. To test whether CarboKitten captures the same degree of heterogeneity, we used modern observed data.
+$(LocalResource("fig/Joulters_cay.jpg"))
 """
 
-# ╔═╡ 1f0f95b1-9a82-47f8-ac48-2d3c56471daa
+# ╔═╡ b6b58248-d1ef-49ae-96b3-2f36567a9ca2
 md"""
-# Practical
+## Habitat mapping
+We chose the images from 1945, interpreted the habitat distribution, and compared it to the same habitats in 2019 satellite images.
+
+$(LocalResource("fig/Joulters_habitat.png"))
 """
 
-# ╔═╡ a382876a-f900-4f1b-955b-a4a3aca79be5
+# ╔═╡ 5d83cb24-86b5-44dc-b4e2-81d12666cabf
 md"""
-## Instructions
-The cells below are not part of the presentation. Add things here that are need to run the notebook.
+## Measuring spatial heterogeneity
+Here we use a proxy called *spatial entropy* (SE) to measure the 2D heterogeneity. The definition is presented below. 
 
-In the markdown:
-- Use level-1 headers (single `#`) for a new chapter
-- Use level-2 headers (double `##`) for a new slide
-"""
+`DisCon` - Number of dissimilar facies connections 
 
-# ╔═╡ 85992544-7b70-4cc4-9d98-621ac54370a6
-md"""
-- [Docs on writing slides in Pluto](https://www.andreaskroepelin.de/blog/plutoslides/)
+`TotCon` - Total number of connections
+
+
+**Manuscript submitted - ongoing work**
+
+
+$$SE = DisCon / TotCon$$
+
+$(LocalResource("fig/spatial_entropy.png"))
 """
 
 # ╔═╡ 6ee4b02a-2d84-465c-970b-4fc8c44c33fd
-# ╠═╡ disabled = true
-#=╠═╡
 begin
 	@kwdef struct TwoColumn{L, R}
 	    left::L
@@ -548,12 +541,6 @@ begin
 	    write(io, """</div></div>""")
 	end
 end
-  ╠═╡ =#
-
-# ╔═╡ b47fb5cf-1a5d-4e78-821e-c247794ba65b
-function TwoColumn(left, right, frac)
-	PlutoUI.ExperimentalLayout.grid([left right])
-end
 
 # ╔═╡ 02c49ad8-8a82-456a-9374-d21042bb1bc1
 TwoColumn(md"""
@@ -567,8 +554,8 @@ TwoColumn(md"""
 Utrecht, May 28, 2026
 """, PlutoUI.LocalResource("./fig/mind-the-gap.png", :width=>200), 70)
 
-# ╔═╡ dc6d8d67-91b1-45ab-b7b0-996b752112bf
-TwoColumn(md"""          
+# ╔═╡ e32ba22a-034f-430f-83ce-1774a26b7429
+TwoColumn(md"""
 **Primary control over sediment production:**
 
 - Biomineralizing organisms
@@ -580,8 +567,7 @@ TwoColumn(md"""
 - Topography
 - Subsidence
 ...
-""",
-md"""
+""", md"""
 Bahama Bank
 $(LocalResource("./fig/Bahamabank.jpg", :height=>400))
 [By NASA](http://www.ioccg.org/gallery/bahamabank.html) ([Public Domain](https://commons.wikimedia.org/w/index.php?curid=4279073))
@@ -589,6 +575,8 @@ $(LocalResource("./fig/Bahamabank.jpg", :height=>400))
 
 # ╔═╡ fe8d2c6e-a124-4561-8864-e40cf00ca177
 TwoColumn(md"""
+
+	
 **Complexity**
 
 - Not just transport
@@ -617,7 +605,11 @@ This makes carbonate an important target to study. As a geoscientist, investigat
 """ =#
 
 # ╔═╡ 3f16dfb2-bc9e-4f69-8405-215f3099498f
+begin
+md"""## Existing Software"""
 TwoColumn(md"""
+
+		  
 Not open source:
 - CARBONATE 3D
 - CARB3D+
@@ -632,6 +624,7 @@ $(LocalResource("./fig/oil.jpg"))
 #=
 We need an open-source carbonate platform forward model! And here we will show examples of utilising this model to answer two questions in geology.
 =#
+end
 
 # ╔═╡ 5c2d4e05-b8b7-416f-b56d-c9b73ab72858
 TwoColumn(md"""
@@ -655,6 +648,41 @@ TwoColumn(md"""
 md"""
 $(LocalResource("fig/active-layer-export.svg"))
 """, 50)
+
+# ╔═╡ 9db54abf-52b0-4884-9d69-30e3ea9507ea
+TwoColumn(md"""
+- Sediment profile
+- Stratigraphic column
+- Age-depth model
+- Wheeler (chronostratigraphic) diagram
+- Topography plots""",
+md"""
+$(LocalResource("fig/strat_col.png"))
+""",50)
+
+# ╔═╡ ded8a137-8111-4912-841b-30eaff4c7fc0
+TwoColumn(md"""
+Typical input data:
+
+- external sea-level curve
+- external insolation curve
+- facies properties
+- subsidence
+""",
+md"""
+Input formats:
+		  
+- importing CSV files
+- functions (e.g. interpolation, stochastic process)
+- inline (anonymous) functions
+
+```
+const INPUT = Input(
+sea_level = t -> 10.0u"m" * sin(2pi / 100u"kyr")
+)
+```
+""",50)
+
 
 # ╔═╡ c92b69a9-3f28-4f4f-9825-a64826b81895
 
@@ -695,28 +723,6 @@ end
 # ╔═╡ afa830cf-f4ce-442d-9649-3e912893052c
 summary_plot(bs92_output)
 
-# ╔═╡ 3f86f55e-e56b-41b1-bff5-f05eeda0fbdf
-model = let
-	df = DataSets.miller_2020()
-	ldf = df[df.refkey .== "846 Lisiecki", :]
-	loess(ldf.time |> in_units_of(u"Myr"), ldf.sealevel |> in_units_of(u"m"), span=0.005)
-end
-
-# ╔═╡ 9cf75959-90ec-4cd2-8c00-a95a2ffb1340
-let
-	t = -0.9:0.001:-0.2
-	s = predict(model, t)
-	fig = Figure()
-	ax = Axis(fig[1,1])
-	band!(ax, t, -20.0, max.(s, -20.0), color=:lemonchiffon)
-	lines!(ax, t, s)
-	hlines!(ax, -20.0, color=:black)
-	fig
-end
-
-# ╔═╡ 2a82d293-4313-4591-b7f3-17599391ebd2
-CAFeedbackExample.main()
-
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
@@ -724,17 +730,15 @@ CarboKitten = "690c6d5c-626a-429f-a06b-981a1dae1c19"
 GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
 GraphvizDotLang = "6039e64d-d8b8-4c93-8e43-7efd2f757352"
 Interpolations = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
-Loess = "4345ca2d-374a-55d4-8d30-97f9976e7612"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 
 [compat]
 CarboKitten = "~0.6.0"
-GLMakie = "~0.13.9"
+GLMakie = "~0.13.10"
 GraphvizDotLang = "~0.2.1"
 Interpolations = "~0.16.2"
-Loess = "~0.6.5"
-PlutoUI = "~0.7.60"
+PlutoUI = "~0.7.80"
 Unitful = "~1.28.0"
 """
 
@@ -744,7 +748,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.12.5"
 manifest_format = "2.0"
-project_hash = "b4f755476d374819fdae47cab927162d1af4053b"
+project_hash = "cc4d31c96150bb1f99f0eea26a0bef70bb9640ca"
 
 [[deps.AbstractFFTs]]
 deps = ["LinearAlgebra"]
@@ -937,15 +941,19 @@ version = "3.31.0"
 
 [[deps.ColorTypes]]
 deps = ["FixedPointNumbers", "Random"]
-git-tree-sha1 = "b10d0b65641d57b8b4d5e234446582de5047050d"
+git-tree-sha1 = "67e11ee83a43eb71ddc950302c53bf33f0690dfe"
 uuid = "3da002f7-5984-5a60-b8a6-cbb66c0b333f"
-version = "0.11.5"
+version = "0.12.1"
+weakdeps = ["StyledStrings"]
+
+    [deps.ColorTypes.extensions]
+    StyledStringsExt = "StyledStrings"
 
 [[deps.ColorVectorSpace]]
 deps = ["ColorTypes", "FixedPointNumbers", "LinearAlgebra", "Requires", "Statistics", "TensorCore"]
-git-tree-sha1 = "a1f44953f2382ebb937d60dafbe2deea4bd23249"
+git-tree-sha1 = "8b3b6f87ce8f65a2b4f857528fd8d70086cd72b1"
 uuid = "c3611d14-8923-5661-9e6a-0046d554d3a4"
-version = "0.10.0"
+version = "0.11.0"
 weakdeps = ["SpecialFunctions"]
 
     [deps.ColorVectorSpace.extensions]
@@ -1055,17 +1063,6 @@ deps = ["Mmap"]
 git-tree-sha1 = "9e2f36d3c96a820c678f2f1f1782582fcf685bae"
 uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 version = "1.9.1"
-
-[[deps.Distances]]
-deps = ["LinearAlgebra", "Statistics", "StatsAPI"]
-git-tree-sha1 = "c7e3a542b999843086e2f29dac96a618c105be1d"
-uuid = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"
-version = "0.10.12"
-weakdeps = ["ChainRulesCore", "SparseArrays"]
-
-    [deps.Distances.extensions]
-    DistancesChainRulesCoreExt = "ChainRulesCore"
-    DistancesSparseArraysExt = "SparseArrays"
 
 [[deps.Distributed]]
 deps = ["Random", "Serialization", "Sockets"]
@@ -1260,9 +1257,9 @@ version = "3.4.1+1"
 
 [[deps.GLMakie]]
 deps = ["ColorTypes", "Colors", "FileIO", "FixedPointNumbers", "FreeTypeAbstraction", "GLFW", "GeometryBasics", "LinearAlgebra", "Makie", "Markdown", "MeshIO", "ModernGL", "Observables", "PrecompileTools", "Printf", "ShaderAbstractions", "StaticArrays"]
-git-tree-sha1 = "1e0d427d2c73eb5a7564394df2c9fec8b85e7805"
+git-tree-sha1 = "da0780bbf5f0faa1cdd1567d2dbee0cf841557a7"
 uuid = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
-version = "0.13.9"
+version = "0.13.10"
 
 [[deps.GeometryBasics]]
 deps = ["EarCut_jll", "Extents", "IterTools", "LinearAlgebra", "PrecompileTools", "Random", "StaticArrays"]
@@ -1367,15 +1364,15 @@ version = "0.0.5"
 
 [[deps.HypertextLiteral]]
 deps = ["Tricks"]
-git-tree-sha1 = "7134810b1afce04bbc1045ca1985fbe81ce17653"
+git-tree-sha1 = "d1a86724f81bcd184a38fd284ce183ec067d71a0"
 uuid = "ac1192a8-f4b3-4bfe-ba22-af5b92cd3ab2"
-version = "0.9.5"
+version = "1.0.0"
 
 [[deps.IOCapture]]
 deps = ["Logging", "Random"]
-git-tree-sha1 = "b6d6bfdd7ce25b0f9b2f6b3dd56b2673a66c8770"
+git-tree-sha1 = "0ee181ec08df7d7c911901ea38baf16f755114dc"
 uuid = "b5f81e59-6552-4d32-b1f0-c071b021bf89"
-version = "0.2.5"
+version = "1.0.0"
 
 [[deps.ImageAxes]]
 deps = ["AxisArrays", "ImageBase", "ImageCore", "Reexport", "SimpleTraits"]
@@ -1462,9 +1459,9 @@ version = "0.16.2"
 
 [[deps.IntervalArithmetic]]
 deps = ["CRlibm", "CoreMath", "MacroTools", "OpenBLASConsistentFPCSR_jll", "Printf", "Random", "RoundingEmulator"]
-git-tree-sha1 = "921d7e91687e15a2c7c269c226960491fc041832"
+git-tree-sha1 = "3e6273749a2df3a5c9067657510ad01ba5039a92"
 uuid = "d1acc4aa-44c8-5952-acd4-ba5d80a2a253"
-version = "1.0.9"
+version = "1.0.8"
 
     [deps.IntervalArithmetic.extensions]
     IntervalArithmeticArblibExt = "Arblib"
@@ -1544,10 +1541,16 @@ uuid = "692b3bcd-3c85-4b1f-b108-f13ce0eb3210"
 version = "1.8.0"
 
 [[deps.JSON]]
-deps = ["Dates", "Mmap", "Parsers", "Unicode"]
-git-tree-sha1 = "31e996f0a15c7b280ba9f76636b3ff9e2ae58c9a"
+deps = ["Dates", "Logging", "Parsers", "PrecompileTools", "StructUtils", "UUIDs", "Unicode"]
+git-tree-sha1 = "f76f7560267b840e492180f9899b472f30b88450"
 uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
-version = "0.21.4"
+version = "1.6.0"
+
+    [deps.JSON.extensions]
+    JSONArrowExt = ["ArrowTypes"]
+
+    [deps.JSON.weakdeps]
+    ArrowTypes = "31f734f8-188a-4ce0-8406-c8a06bd891cd"
 
 [[deps.JpegTurbo]]
 deps = ["CEnum", "FileIO", "ImageCore", "JpegTurbo_jll", "TOML"]
@@ -1681,12 +1684,6 @@ deps = ["Libdl", "OpenBLAS_jll", "libblastrampoline_jll"]
 uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 version = "1.12.0"
 
-[[deps.Loess]]
-deps = ["Distances", "LinearAlgebra", "Statistics", "StatsAPI", "StatsFuns"]
-git-tree-sha1 = "b1ad83b367b915e2dc485dee3d62a6a6317d7ad4"
-uuid = "4345ca2d-374a-55d4-8d30-97f9976e7612"
-version = "0.6.5"
-
 [[deps.LogExpFunctions]]
 deps = ["DocStringExtensions", "IrrationalConstants", "LinearAlgebra"]
 git-tree-sha1 = "13ca9e2586b89836fd20cccf56e57e2b9ae7f38f"
@@ -1714,9 +1711,9 @@ uuid = "e6f89c97-d47a-5376-807f-9c37f3926c36"
 version = "1.2.0"
 
 [[deps.MIMEs]]
-git-tree-sha1 = "65f28ad4b594aebe22157d6fac869786a255b7eb"
+git-tree-sha1 = "c64d943587f7187e751162b3b84445bbbd79f691"
 uuid = "6c6e2e6c-3030-632d-7369-2d6c69616d65"
-version = "0.1.4"
+version = "1.1.0"
 
 [[deps.MPIABI_jll]]
 deps = ["Artifacts", "Hwloc_jll", "JLLWrappers", "LazyArtifacts", "Libdl", "MPIPreferences", "TOML"]
@@ -1749,9 +1746,9 @@ version = "0.5.16"
 
 [[deps.Makie]]
 deps = ["Animations", "Base64", "CRC32c", "ColorBrewer", "ColorSchemes", "ColorTypes", "Colors", "ComputePipeline", "Contour", "Dates", "DelaunayTriangulation", "Distributions", "DocStringExtensions", "Downloads", "FFMPEG_jll", "FileIO", "FilePaths", "FixedPointNumbers", "Format", "FreeType", "FreeTypeAbstraction", "GeometryBasics", "GridLayoutBase", "ImageBase", "ImageIO", "InteractiveUtils", "Interpolations", "IntervalSets", "InverseFunctions", "Isoband", "KernelDensity", "LaTeXStrings", "LinearAlgebra", "MacroTools", "Markdown", "MathTeXEngine", "Observables", "OffsetArrays", "PNGFiles", "Packing", "Pkg", "PlotUtils", "PolygonOps", "PrecompileTools", "Printf", "REPL", "Random", "RelocatableFolders", "Scratch", "ShaderAbstractions", "Showoff", "SignedDistanceFields", "SparseArrays", "Statistics", "StatsBase", "StatsFuns", "StructArrays", "TriplotBase", "UnicodeFun", "Unitful"]
-git-tree-sha1 = "68af66ec16af8b152309310251ecb4fbfe39869f"
+git-tree-sha1 = "0708c6a1f3cb18ba6482c4174058084c8d6deaf4"
 uuid = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
-version = "0.24.9"
+version = "0.24.10"
 
     [deps.Makie.extensions]
     MakieDynamicQuantitiesExt = "DynamicQuantities"
@@ -1771,9 +1768,9 @@ version = "1.11.0"
 
 [[deps.MathTeXEngine]]
 deps = ["AbstractTrees", "Automa", "DataStructures", "FreeTypeAbstraction", "GeometryBasics", "LaTeXStrings", "REPL", "RelocatableFolders", "UnicodeFun"]
-git-tree-sha1 = "b0abe548c2609d9e3678d5ddf5a227da887ee5ce"
+git-tree-sha1 = "7eb8cdaa6f0e8081616367c10b31b9d9b34bb02a"
 uuid = "0a4f8689-d25c-4efe-a92b-7142dfc1aa53"
-version = "0.6.8"
+version = "0.6.7"
 
 [[deps.MeshIO]]
 deps = ["ColorTypes", "FileIO", "GeometryBasics", "Printf"]
@@ -1983,10 +1980,10 @@ uuid = "995b91a9-d308-5afd-9ec6-746e21dbc043"
 version = "1.4.4"
 
 [[deps.PlutoUI]]
-deps = ["AbstractPlutoDingetjes", "Base64", "ColorTypes", "Dates", "FixedPointNumbers", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "MIMEs", "Markdown", "Random", "Reexport", "URIs", "UUIDs"]
-git-tree-sha1 = "eba4810d5e6a01f612b948c9fa94f905b49087b0"
+deps = ["AbstractPlutoDingetjes", "Base64", "ColorTypes", "Dates", "Downloads", "FixedPointNumbers", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "Logging", "MIMEs", "Markdown", "Random", "Reexport", "URIs", "UUIDs"]
+git-tree-sha1 = "fbc875044d82c113a9dee6fc14e16cf01fd48872"
 uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
-version = "0.7.60"
+version = "0.7.80"
 
 [[deps.PolygonOps]]
 git-tree-sha1 = "77b3d3605fc1cd0b42d95eba87dfcd2bf67d5ff6"
@@ -2301,6 +2298,22 @@ version = "0.7.3"
     LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
     SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
     StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
+
+[[deps.StructUtils]]
+deps = ["Dates", "UUIDs"]
+git-tree-sha1 = "82bee338d650aa515f31866c460cb7e3bcef90b8"
+uuid = "ec057cc2-7a8d-4b58-b3b3-92acb9f63b42"
+version = "2.8.2"
+
+    [deps.StructUtils.extensions]
+    StructUtilsMeasurementsExt = ["Measurements"]
+    StructUtilsStaticArraysCoreExt = ["StaticArraysCore"]
+    StructUtilsTablesExt = ["Tables"]
+
+    [deps.StructUtils.weakdeps]
+    Measurements = "eff96d63-e80a-5855-80a2-b1b0885c5ab7"
+    StaticArraysCore = "1e83bf80-4336-4d27-bf5d-d5a4f845583c"
+    Tables = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
 
 [[deps.StyledStrings]]
 uuid = "f489334b-da3d-4c2e-b8f0-e476e12c162b"
@@ -2749,30 +2762,28 @@ version = "1.13.0+0"
 # ╟─c25f2a9f-f7c1-41f6-b4ac-03b19377a6e6
 # ╟─02c49ad8-8a82-456a-9374-d21042bb1bc1
 # ╟─f7b4113e-16fe-4833-95f7-e38fccaa38b7
-# ╟─98138204-672e-4856-8412-3829cb2fa793
-# ╟─dc6d8d67-91b1-45ab-b7b0-996b752112bf
-# ╟─636dbfe6-e4d5-4251-88e9-50282d0d614f
+# ╟─726a44e0-819e-44d5-ac52-b03ca052e3e8
+# ╟─e32ba22a-034f-430f-83ce-1774a26b7429
+# ╟─f9812c71-da1f-408f-800b-f42bbb9151b3
 # ╟─fe8d2c6e-a124-4561-8864-e40cf00ca177
 # ╟─d3f8125a-7b59-4ac4-94f1-61fce8903b4b
 # ╟─741bbf64-5b80-4e5c-b53e-98d756d68ef6
-# ╟─7d7033f1-0443-410d-8e73-62eabb53ea9c
-# ╟─6b5d1935-0773-4933-ae56-b5b88b81f87e
-# ╟─3dd47c47-2e3a-4970-982d-b1c2eb9cfdd7
-# ╟─e9754cdc-1180-4bc5-b87c-a11d659d33aa
-# ╟─db6fadc9-4552-4a69-8bf3-3bae69c329dd
-# ╟─3f16dfb2-bc9e-4f69-8405-215f3099498f
 # ╟─8bae0730-f7bb-4b4e-9aef-98a749f5ff6a
+# ╟─e9754cdc-1180-4bc5-b87c-a11d659d33aa
+# ╟─3f16dfb2-bc9e-4f69-8405-215f3099498f
 # ╟─40a80600-17de-4012-a8bf-4635485144ef
 # ╟─d12d3e20-4fc3-4240-8f3b-95c520117740
 # ╟─bb797b6f-47c2-4ebc-a096-ed2e8cd0b9ff
 # ╟─6f6fa95d-b163-4cc6-ab3c-9bc86083d54d
 # ╟─afa830cf-f4ce-442d-9649-3e912893052c
-# ╟─5b17e7e3-9ba8-45d7-81b6-935f4e6c7c58
+# ╟─9a3e0620-0353-4437-b2ed-c21e8f5e0da3
 # ╟─5c2d4e05-b8b7-416f-b56d-c9b73ab72858
 # ╟─dc828c07-7650-41ca-87b0-ca71378eecf2
 # ╟─a4edb5e9-995c-42eb-89f8-d7f85dfb8dc1
 # ╟─e0e0bc64-c691-471e-8594-ccdf352887f4
 # ╟─f9d9216c-53ab-4878-8701-8877f2ee3dcb
+# ╟─2df751f2-0a2a-42d7-9d0f-3db4af3a8f5d
+# ╠═f14d4f60-75c0-4c75-acb1-8de730aaf952
 # ╟─dcabbeb1-4384-4841-b26c-213887feba61
 # ╟─86219909-5970-47fd-aad6-0d2698d5cdd3
 # ╟─042b5bf9-5c77-436a-be74-d3949b2f84f2
@@ -2780,26 +2791,33 @@ version = "1.13.0+0"
 # ╟─a0066da2-bf7a-410e-8684-3899609b5e01
 # ╠═99476a07-99e2-4d5d-84d9-313c4d52bc16
 # ╟─154c8beb-1554-42ff-b863-741637a4d35c
+# ╟─8916e66a-2f60-479d-bce9-f4f505e6ef31
+# ╟─dbaff53b-0fc3-4886-ad53-ae1cc1faa7bc
+# ╟─65b0bc8a-8b91-45a4-b868-bf3d30c46460
+# ╠═9db54abf-52b0-4884-9d69-30e3ea9507ea
+# ╟─da9142a3-e966-4d36-b2e7-a559d233292e
+# ╟─bf8a9983-f8e2-4640-b6eb-d3e5ce9aa317
+# ╟─1ccdb93b-33a5-441e-86b1-ab2b1e085ad5
+# ╟─cc443da5-fbbe-473f-aa8a-a526cc37fce5
+# ╟─e267e3f6-c0b9-486f-8c0c-c2ce202e2b29
+# ╟─e9f812a9-2b5c-4ad1-9419-0cb5261291aa
+# ╟─ded8a137-8111-4912-841b-30eaff4c7fc0
+# ╟─126ff04f-5956-4d51-aa31-96bebd656032
+# ╟─cd7142f8-443d-4b8c-971c-7a480bbde06d
 # ╟─e67cd7cf-2c25-41d6-bc2b-7ffa9162e456
 # ╟─f36c4f74-6177-4a63-87e2-910ef94f16fc
-# ╠═cd7142f8-443d-4b8c-971c-7a480bbde06d
 # ╟─a00ef21a-dee2-49b3-8cef-ba03313ae8c1
 # ╟─d1bc6120-b769-4394-9a46-946c00f533df
 # ╟─e6234d9e-e212-4c3e-b3a0-58a918bd1ccf
 # ╟─c92b69a9-3f28-4f4f-9825-a64826b81895
-# ╟─289c9bc6-8627-46cd-b07d-820a9f86855d
-# ╟─1f0f95b1-9a82-47f8-ac48-2d3c56471daa
-# ╟─a382876a-f900-4f1b-955b-a4a3aca79be5
-# ╟─85992544-7b70-4cc4-9d98-621ac54370a6
-# ╠═0dbd9cce-a006-11ef-365b-d388b63f5339
-# ╠═771e87fa-4ee7-4c66-b71f-7fbc99505f7c
-# ╠═6ee4b02a-2d84-465c-970b-4fc8c44c33fd
-# ╠═b47fb5cf-1a5d-4e78-821e-c247794ba65b
-# ╠═aa20619b-fe16-4b01-9532-8f6c6277d399
-# ╠═d775081d-733c-4d0a-ab33-f721d8074604
-# ╠═3f86f55e-e56b-41b1-bff5-f05eeda0fbdf
-# ╠═9cf75959-90ec-4cd2-8c00-a95a2ffb1340
-# ╠═3430e347-119a-4efb-aeb9-a197f7456030
-# ╠═2a82d293-4313-4591-b7f3-17599391ebd2
+# ╠═d4a4270c-5323-40e0-83c8-25f1fca65b00
+# ╟─b6b58248-d1ef-49ae-96b3-2f36567a9ca2
+# ╟─5d83cb24-86b5-44dc-b4e2-81d12666cabf
+# ╟─0dbd9cce-a006-11ef-365b-d388b63f5339
+# ╟─771e87fa-4ee7-4c66-b71f-7fbc99505f7c
+# ╟─6ee4b02a-2d84-465c-970b-4fc8c44c33fd
+# ╟─aa20619b-fe16-4b01-9532-8f6c6277d399
+# ╟─c510433d-23d7-45f4-8df8-85f896f15173
+# ╟─d775081d-733c-4d0a-ab33-f721d8074604
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
