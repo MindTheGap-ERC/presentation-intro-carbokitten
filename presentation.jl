@@ -246,6 +246,16 @@ Incomplete stratigraphy will bias our interpretation of mode of evolution toward
 
 """
 
+# ╔═╡ 40a80600-17de-4012-a8bf-4635485144ef
+md"# CarboKitten.jl
+
+Our flagship features:
+
+- Carbonate production (Bosscher & Schlager 1992)
+- Ecological interactions leading to spatial heterogeneity (Burgess 2013)
+- Bespoke sediment transport model (Hidding et al. 2025)
+"
+
 # ╔═╡ d12d3e20-4fc3-4240-8f3b-95c520117740
 md"""## CarboKitten's architecture
 
@@ -272,22 +282,6 @@ md"""
 
 $(LocalResource("./fig/BS92.png"))
 """
-
-# ╔═╡ 40a80600-17de-4012-a8bf-4635485144ef
-md"# CarboKitten.jl"
-
-# ╔═╡ 6fe8d06c-1419-4e6b-8585-db51f9f2b761
-md"""
-## CarboKitten.jl in short
-
-- Rewrite of CarboCAT
-- Julia
-- Fast
-- Open Source
-"""
-
-# ╔═╡ b473ef68-6e08-428c-a99a-f27af6b8c73b
-md"## Cellular Automata"
 
 # ╔═╡ dc828c07-7650-41ca-87b0-ca71378eecf2
 md"""
@@ -534,9 +528,11 @@ We need an open-source carbonate platform forward model! And here we will show e
 
 # ╔═╡ 5c2d4e05-b8b7-416f-b56d-c9b73ab72858
 TwoColumn(md"""
-- Model biology
-- Competition, limited resources
-- Reduced to elementary rules
+# Cellular automaton 
+		  
+- Dispersal, facilitation, competition
+- Not the actual biological process, but useful heuristic
+- Unique ruleset: infinite heterogeneity (never converges on a fixed distribution)
 """,
 md"""
 $(LocalResource("./fig/life.gif"))
@@ -2636,13 +2632,11 @@ version = "1.13.0+0"
 # ╟─e9754cdc-1180-4bc5-b87c-a11d659d33aa
 # ╟─3f16dfb2-bc9e-4f69-8405-215f3099498f
 # ╟─8bae0730-f7bb-4b4e-9aef-98a749f5ff6a
-# ╠═d12d3e20-4fc3-4240-8f3b-95c520117740
-# ╟─bb797b6f-47c2-4ebc-a096-ed2e8cd0b9ff
-# ╠═6f6fa95d-b163-4cc6-ab3c-9bc86083d54d
-# ╟─afa830cf-f4ce-442d-9649-3e912893052c
 # ╟─40a80600-17de-4012-a8bf-4635485144ef
-# ╟─6fe8d06c-1419-4e6b-8585-db51f9f2b761
-# ╟─b473ef68-6e08-428c-a99a-f27af6b8c73b
+# ╟─d12d3e20-4fc3-4240-8f3b-95c520117740
+# ╟─bb797b6f-47c2-4ebc-a096-ed2e8cd0b9ff
+# ╟─6f6fa95d-b163-4cc6-ab3c-9bc86083d54d
+# ╟─afa830cf-f4ce-442d-9649-3e912893052c
 # ╟─5c2d4e05-b8b7-416f-b56d-c9b73ab72858
 # ╟─dc828c07-7650-41ca-87b0-ca71378eecf2
 # ╟─a4edb5e9-995c-42eb-89f8-d7f85dfb8dc1
