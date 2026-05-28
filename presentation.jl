@@ -364,6 +364,107 @@ md"""
 # ╔═╡ 99476a07-99e2-4d5d-84d9-313c4d52bc16
 summary_plot(alcap_output)
 
+# ╔═╡ dbaff53b-0fc3-4886-ad53-ae1cc1faa7bc
+md"""
+# Visualization
+
+$(LocalResource("fig/alcaps-alternative.png"))
+"""
+
+# ╔═╡ da9142a3-e966-4d36-b2e7-a559d233292e
+md"""
+### Sediment profile
+
+$(LocalResource("fig/profile_fraction.png"))
+"""
+
+# ╔═╡ bf8a9983-f8e2-4640-b6eb-d3e5ce9aa317
+md"""
+### Wheeler diagram
+
+$(LocalResource("fig/wheeler_diagram.png"))
+"""
+
+# ╔═╡ 1ccdb93b-33a5-441e-86b1-ab2b1e085ad5
+md"""
+### Age-depth model
+
+$(LocalResource("fig/adm.png"))
+"""
+
+# ╔═╡ cc443da5-fbbe-473f-aa8a-a526cc37fce5
+md"""
+### Topography
+
+$(LocalResource("fig/glamour_view.png"))
+"""
+
+# ╔═╡ e267e3f6-c0b9-486f-8c0c-c2ce202e2b29
+md"""
+# Input and output
+
+## Output
+
+- Default output format is HDF5, which includes metadata of each run
+- Alternatively user can output into memory 
+- User can select extent of saving (complete grid, slice, columns etc)
+- Functions for saving CSV for interoperability
+```{julia}
+output_spec = Dict(
+	:topography => OutputSpec(write_interval=100),
+	:profile => OutputSpec(slice=(:, 25))
+)
+```
+"""
+
+# ╔═╡ 126ff04f-5956-4d51-aa31-96bebd656032
+md"""
+## Input external insolation from a CSV file
+
+$(LocalResource("fig/variable-insolation.png"))
+"""
+# ╔═╡ e67cd7cf-2c25-41d6-bc2b-7ffa9162e456
+md"""
+## CA Feedback
+
+- Kill factories that don't produce enough.
+"""
+
+# ╔═╡ f36c4f74-6177-4a63-87e2-910ef94f16fc
+begin
+	GLMakie.activate!()
+	fig = Figure(size=(1000, 800))
+	
+	header, topography = read_volume("ca-wo-feedback.h5", :topography)
+	_, profile = read_slice("ca-wo-feedback.h5", :profile)
+	
+	ax1 = Axis(fig[1, 1:2])
+	sediment_profile!(ax1, header, profile)
+	ax1.title = "without feedback"
+	
+	ax1_wh1 = Axis(fig[3, 1])
+	ax1_wh2 = Axis(fig[3, 2])
+	sa, ft = wheeler_diagram!(ax1_wh1, ax1_wh2, header, profile)
+	Colorbar(fig[2, 1], sa; vertical=false, label="sediment accumulation [m/Myr]")
+	Colorbar(fig[2, 2], ft; vertical=false, ticks=1:3, label="dominant facies")
+	
+	header, topography = read_volume("ca-feedback.h5", :topography)
+	_, profile = read_slice("ca-feedback.h5", :profile)
+	
+	ax2 = Axis(fig[1, 3:4])
+	sediment_profile!(ax2, header, profile)
+	ax2.title = "with feedback"
+	
+	ax2_wh1 = Axis(fig[3, 3])
+	ax2_wh2 = Axis(fig[3, 4])
+	sa, ft = wheeler_diagram!(ax2_wh1, ax2_wh2, header, profile)
+	
+	Colorbar(fig[2, 3], sa; vertical=false, label="sediment accumulation [m/Myr]")
+	Colorbar(fig[2, 4], ft; vertical=false, ticks=1:3, label="dominant facies")
+	
+	fig
+end
+
 # ╔═╡ cd7142f8-443d-4b8c-971c-7a480bbde06d
 md"""
 # Denudation
@@ -594,6 +695,35 @@ TwoColumn(md"""
 md"""
 $(LocalResource("fig/active-layer-export.svg"))
 """, 50)
+
+# ╔═╡ 9db54abf-52b0-4884-9d69-30e3ea9507ea
+TwoColumn(md"""
+## Types of diagrams
+
+- Sediment profile
+- Stratigraphic column
+- Age-depth model
+- Wheeler (chronostratigraphic) diagram
+- Topography plots""",
+md"""
+$(LocalResource("fig/strat_col.png"))
+""",50)
+
+# ╔═╡ ded8a137-8111-4912-841b-30eaff4c7fc0
+TwoColumn(md"""
+Typical input data:
+
+- external sea-level curve
+- external insolation curve
+- facies properties
+- subsidence
+""",
+md"""
+Input formats:
+- inline (anonymous) functions
+- importing CSV files
+""",50)
+
 
 # ╔═╡ c92b69a9-3f28-4f4f-9825-a64826b81895
 
@@ -2717,12 +2847,24 @@ version = "1.13.0+0"
 # ╟─2df751f2-0a2a-42d7-9d0f-3db4af3a8f5d
 # ╠═f14d4f60-75c0-4c75-acb1-8de730aaf952
 # ╟─dcabbeb1-4384-4841-b26c-213887feba61
-# ╟─86219909-5970-47fd-aad6-0d2698d5cdd3
+# ╠═86219909-5970-47fd-aad6-0d2698d5cdd3
 # ╟─042b5bf9-5c77-436a-be74-d3949b2f84f2
-# ╟─8916e66a-2f60-479d-bce9-f4f505e6ef31
+# ╠═8916e66a-2f60-479d-bce9-f4f505e6ef31
 # ╟─a0066da2-bf7a-410e-8684-3899609b5e01
-# ╟─99476a07-99e2-4d5d-84d9-313c4d52bc16
+# ╠═99476a07-99e2-4d5d-84d9-313c4d52bc16
+# ╟─dbaff53b-0fc3-4886-ad53-ae1cc1faa7bc
+# ╟─9db54abf-52b0-4884-9d69-30e3ea9507ea
+# ╟─da9142a3-e966-4d36-b2e7-a559d233292e
+# ╟─bf8a9983-f8e2-4640-b6eb-d3e5ce9aa317
+# ╟─1ccdb93b-33a5-441e-86b1-ab2b1e085ad5
+# ╟─cc443da5-fbbe-473f-aa8a-a526cc37fce5
+# ╟─e267e3f6-c0b9-486f-8c0c-c2ce202e2b29
+# ╟─ded8a137-8111-4912-841b-30eaff4c7fc0
+# ╟─126ff04f-5956-4d51-aa31-96bebd656032
 # ╟─cd7142f8-443d-4b8c-971c-7a480bbde06d
+# ╟─e67cd7cf-2c25-41d6-bc2b-7ffa9162e456
+# ╟─f36c4f74-6177-4a63-87e2-910ef94f16fc
+# ╠═cd7142f8-443d-4b8c-971c-7a480bbde06d
 # ╟─a00ef21a-dee2-49b3-8cef-ba03313ae8c1
 # ╟─d1bc6120-b769-4394-9a46-946c00f533df
 # ╟─e6234d9e-e212-4c3e-b3a0-58a918bd1ccf
