@@ -407,6 +407,13 @@ We can use three ways to simulated denudation:
 
 """
 
+# ╔═╡ 154c8beb-1554-42ff-b863-741637a4d35c
+md"""
+## Cementation and disintegration
+
+$(LocalResource("fig/canvas.png"))
+"""
+
 # ╔═╡ e67cd7cf-2c25-41d6-bc2b-7ffa9162e456
 md"""
 ## CA Feedback
@@ -2789,6 +2796,10 @@ version = "1.13.0+0"
 # ╟─dcabbeb1-4384-4841-b26c-213887feba61
 # ╟─86219909-5970-47fd-aad6-0d2698d5cdd3
 # ╟─042b5bf9-5c77-436a-be74-d3949b2f84f2
+# ╠═8916e66a-2f60-479d-bce9-f4f505e6ef31
+# ╟─a0066da2-bf7a-410e-8684-3899609b5e01
+# ╠═99476a07-99e2-4d5d-84d9-313c4d52bc16
+# ╟─154c8beb-1554-42ff-b863-741637a4d35c
 # ╟─8916e66a-2f60-479d-bce9-f4f505e6ef31
 # ╟─dbaff53b-0fc3-4886-ad53-ae1cc1faa7bc
 # ╟─65b0bc8a-8b91-45a4-b868-bf3d30c46460
